@@ -2,7 +2,7 @@
 title: Welcome!
 ---
 
-Testing if auto deploy works.
+Testing if auto deploy works. YES IT WORKS
 
 - [Check out the forum thread](https://forums.meteor.com/t/new-mdg-project-the-meteor-guide/10873/1)
 - [See the charter and vision](https://github.com/meteor/guide/blob/master/README.md)
