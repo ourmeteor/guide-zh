@@ -1,45 +1,45 @@
 ---
-title: Mobile
+title: 移动
 order: 32
-description: How to build mobile apps using Meteor's Cordova integration.
+description: 如何利用 Meteor 的 Cordova 整合构建移动应用。
 discourseTopicId: 20195
 ---
 
-After reading this guide, you'll know:
+读完这篇文章，您将了解：
 
-1. What Cordova is, and how Meteor integrates with it to build mobile apps from a single codebase
-1. How to set up your local machine for mobile development
-1. How to run and debug your app on a mobile device or simulator/emulator
-1. How hot code push allows you to update your mobile app's code without reinstalling the app on your device or submitting a new version to the store
-1. How to use Cordova plugins to take advantage of native device features
-1. How to access local files and remote resources from your app
-1. What you can do to create a good mobile user experience for your app
-1. How to configure your app to use your own app icon, launch screen, and set other preferences
-1. How to build your project and submit your mobile app to the store
+1. Cordova 是什么，以及 Meteor 如何与它集成从单一代码库构建移动应用
+1. 如何设置您的本地计算机进行移动开发
+1. 如何在移动设备或模拟器上运行及调式您的应用程序
+1. 热推送 (hot code push) 如何做到在无需重新安装或提交新版本到应用商店来升级您的移动应用代码的
+1. 如何使用 Cordova 插件来充分利用原生设备功能
+1. 如何从您的应用程序访问本地文件和远程资源
+1. 您可以通过什么方法来给您的应用程序创造一个良好的移动用户体验
+1. 如何配置您应用程序使用自己的图标，启动界面和其它偏好
+1. 如何创建您自己的项目并将您的应用程序提交到应用商店
 
-<h2 id="introduction">Introduction to Meteor's built-in mobile integration</h2>
+<h2 id="introduction">介绍 Meteor 内置移动集成</h2>
 
-Meteor integrates with [Cordova](https://cordova.apache.org), a well-known Apache open source project, to build mobile apps from the same codebase you use to create regular web apps. With the Cordova integration in Meteor, you can take your existing app and run it on an iOS or Android device with a few simple commands.
+Meteor 集成了 [Cordova](https://cordova.apache.org)，一个著名的 Apache 开源项目，它可以使用您建立 web 应用的同一代码库创建移动应用程序。随着 Cordova 整合进 Meteor，您可以使用一些简单的命令将您的应用程序运行在 iOS 或 Android 设备上。
 
-A Cordova app is a web app written using HTML, CSS, and JavaScript as usual, but it runs in a [web view](#what-environment) embedded in a native app instead of in a stand-alone mobile browser. An important benefit of packaging up your web app as a Cordova app is that all your assets are bundled with the app. This ensures your app will load faster than a web app running on a remote server could, which can make a huge difference for users on slow mobile connections. Another feature of the Cordova integration in Meteor is support for [hot code push](#hot-code-push), which allows you to update your app on users' devices without going through the usual app store review process.
+一个 Cordova 应用是一个用 HTML、CSS和JavaScript写的普通的 web 应用。但它是运行在一个原生嵌入 [web 视图](#what-environment)中而不是一个独立的移动浏览器中。 将您的 web 应用打包成 Cordova 应用一个重要的好处是：你的所有项目资源都与这个应用程序捆绑在一起。这可以确保您的应用程序加载的速度比一个运行在远程服务器上的 web 应用要快，这对于移动网速慢的用户是个福音。整合到 Meteor 的 Cordova 另一个特性是[热推送](#hot-code-push)，它允许你在不通过正常的应用商店审核流程的情况下更新你的应用到用户设备上。
 
-Cordova also opens up access to certain native device features through a [plugin architecture](#cordova-plugins). Plugins allow you to use features not usually available to web apps, such as accessing the device camera or the local file system, interact with barcode or NFC readers, etc.
+Cordova 还可以通过一个[插件架构](#cordova-plugins)访问某些本地设备功能。插件允许您使用通常不会提供给 web 应用程序的功能，如访问设备相机或本地文件系统，条形码或NFC阅读器等。
 
-Because a Cordova app is  a web app, this means you use standard web elements to create your user interface instead of relying on platform-specific native UI components. Creating a good mobile user experience is an art in itself, but is fortunately helped by the availability of various frameworks and libraries.
+由于 Cordova 的应用程序是一个 web 应用程序，这意味着你可以使用标准的Web元素来创建用户界面，而不用依赖于特定平台的原生UI组件。创造良好的移动用户体验本身就是一门艺术，所幸的是通过各种框架和库可以帮助我们实现它。
 
-> <h4 id="what-about-phonegap">What about PhoneGap?</h4>
+> <h4 id="what-about-phonegap">什么是 PhoneGap？</h4>
 
-> You may have heard of PhoneGap, and wonder how it relates to Cordova. PhoneGap is a product name used by Adobe since 2011, when they acquired a company called Nitobi, the original creators of what is now the Cordova project. When Adobe donated the code to Apache in 2012 to ensure a more open governance model, the open source project was rebranded as Cordova. PhoneGap is now one of the distributions of Cordova, on a par with other distributions like Ionic, Telerik, Monaca, or Intel XDK. These distributions mainly differ in tooling and integration with cloud services, but they share the underlying platform and plugins. Meteor could also be considered a Cordova distribution.
+> 您可能听说过 PhoneGap，但它和 Cordova 又是什么关系呢。PhoneGap 是 Adobe 公司2011年命名的一个产品，当时Adobe 收购了一家名为 Nitobi 的公司，就是现在的 Cordova 项目的原创者。Adobe 于2012年将代码发布到 Apache，以确保一个更加开放的管理模式，这个开源项目就是 Cordova。PhoneGap 现在是 Cordova 的发行版之一, 相提并论的其它发行版如：Ionic、Telerik、Monaca 和 Intel XDK。这些发行版的主要区别在于工具和云服务集成，但是它们共享底层平台和插件。Meteor 也被认为是一个 Cordova 的发行版。
 
-<h3 id="cordova-integration-in-meteor">How does the Cordova integration in Meteor work?</h3>
+<h3 id="cordova-integration-in-meteor">整合在 Meteor 中的 Cordova 是如何工作的？</h3>
 
-With Meteor, there is no need to install Cordova yourself, or use the `cordova` command directly. Cordova project creation happens as part of the Meteor run and build commands, and the project itself is considered a build artifact (stored in `.meteor/local/cordova-build` in your app directory) that can be deleted and recreated at any time. Instead of having you modify Cordova's `config.xml` file, Meteor reads a [`mobile-config.js`](http://docs.meteor.com/api/mobile-config.html) file in the root of your app directory and uses the settings specified there to configure the generated project.
+在 Meteor 中你不需要自己安装 Cordova 或直接使用 `cordova` 命令。 Cordova 项目的创建是 Meteor 运行和构建命令的一部分，它也被认为是构建神器（存储在您的应用目录下的 `.meteor/local/cordova-build` 目录中）可随时删除和重构。而不比修改 Cordova 的 `config.xml` 文件， Meteor 读取您的应用程序的根目录下的 [`mobile-config.js`](http://docs.meteor.com/api/mobile-config.html) 文件，并使用那里的设置来配置生成的项目。
 
-Cordova apps don’t load web content over the network, but rely on locally stored HTML, CSS, JavaScript code and other assets. While Cordova by default uses `file://` URLs to load the app, Meteor includes an integrated file serving mechanism on the device to support both bundling the initial assets and incrementally updating your app through [hot code push](#hot-code-push). This means your app will be served from `http://localhost:<port>`, which also has the benefit that web views consider it a [secure origin](https://www.chromium.org/Home/chromium-security/prefer-secure-origins-for-powerful-new-features) and won't block any sensitive features (which they increasingly do for `file://` URLs).
+Cordova 应用程序并不加载网络上的网页内容，它依靠本地存储的 HTML、CSS、JavaScript 代码和其它资源。然而 Cordova 默认使用 `file://` 网址加载应用程序，Meteor 在设备上包含一个集成的文件服务机制，用来支持捆绑初始化资源和通过[热推送](#hot-code-push)增量更新您的应用程序。这意味着您的应用程序会从 `http://localhost:<port>` 提供服务，这样做的好处是 web 视图认为它是一个[安全的源](https://www.chromium.org/Home/chromium-security/prefer-secure-origins-for-powerful-new-features) 并且不会阻止任何敏感的特性 (这是为什么他们越来越多的使用 `file://` 网址).
 
-> <h4 id="what-port">What port will your app be served from?</h4>
+> <h4 id="what-port">您的应用程序从哪个端口提供服务？</h4>
 
-> While Meteor uses a built-in request interception mechanism on Android, supporting `WKWebView` on iOS requires running a real embedded web server instead. That means the local web server needs a port to bind to, and we can’t simply use a fixed port because that might lead to conflicts when running multiple Meteor Cordova apps on the same device. The easiest solution may seem to use a randomized port, but this has a serious drawback: if the port changes each time you run the app, web features that depend on the origin (like caching, localStorage, IndexedDB) won’t persist between runs, and you also wouldn't be able to specify a stable OAuth redirect URL. So instead we now pick a port from a predetermined range (12000-13000), calculated based on the `appId`, a unique identifier that is part of every Meteor project. That ensures the same app will always use the same port, but it hopefully avoids collisions betweens apps as much as possible. (There is still a theoretical possibility of the selected port being in use. Currently, starting the local server will fail in that case.)
+> 虽然 Meteor 在 Android 上使用内建的请求拦截机制，在 iOS 上支持 `WKWebView` 需要运行一个真正的嵌入式 web 服务来替代。这就意味着本地 web 服务需要绑定一个端口，但我们不能简单地用一个固定端口，因为当在同一个设备上运行多个 Meteor Cordova 应用程序时可能导致冲突。最简单的解决方案似乎是使用随机端口，但是有一个严重的问题：如果 if the port changes each time you run the app, web features that depend on the origin (like caching, localStorage, IndexedDB) won’t persist between runs, and you also wouldn't be able to specify a stable OAuth redirect URL. So instead we now pick a port from a predetermined range (12000-13000), calculated based on the `appId`, a unique identifier that is part of every Meteor project. That ensures the same app will always use the same port, but it hopefully avoids collisions betweens apps as much as possible. (There is still a theoretical possibility of the selected port being in use. Currently, starting the local server will fail in that case.)
 
 <h3 id="what-environment">What environment does your Cordova app run in?</h3>
 
