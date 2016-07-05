@@ -43,25 +43,25 @@ discourseTopicId: 19668
 
 设置用于设置环境(中间环境或生产环境)中具体事项，例如用于连接谷歌的访问标志和密钥。在特定环境中运行应用时这些设置不会改变
 
-Environment variables are used to set process specific things, which could conceivably change for different instances of your application's processes. For instance, you can set a different `KADIRA_OPTIONS_HOSTNAME` for each process to ensure that [kadira](#kadira) logs timings with useful hostnames.
+环境变量用于设置应用进程事项，可以根据应用的不同实例进行改变。例如，你可以为各个进程设置不同的 `KADIRA_OPTIONS_HOSTNAME` 来确保 [kadira](#kadira) 日志记录有用的主机名。
 
-A final note on storing these settings: It's not a good idea to store settings the same repository where you keep your app code. Read about good places to put your settings in the [Security article](security.html#api-keys).
+在存储这些设置上还有一点需要说明：不要把这些设置文件跟你的应用代码存放在同一个栈。阅读相关文章了解这些设置最好存放在什么地方 [安全性章节](security.html#api-keys).
 
-<h2 id="other-considerations">Other considerations</h2>
+<h2 id="other-considerations">其他考虑</h2>
 
-There are some other considerations that you should make before you deploy your application to a production host. Remember that you should if possible do these steps for both your production *and* staging environments.
+将应用部署到生产主机前还有其他事项需要考虑。记住，如果可能的话请在生产环境和中间环境中进行这些操作。
 
-<h3 id="domain-name">Domain name</h3>
+<h3 id="domain-name">域名</h3>
 
-What URL will users use to access your site? You'll probably need to register a domain name with a domain registrar, and setup DNS entries to point to the site (this will depend on how you deploy, see below). If you deploy to Galaxy, you can use a `x.meteorapp.com` domain while you are testing the app.
+用户通过什么 URL 访问你的网站？你可能需要向域名注册商注册一个域名，并设置 DNS 指向特定网站(这要看你如何部署，请看下文)。如果你在 Galaxy 部署，在测试应用的时候可以使用 `x.meteorapp.com` 域名。
 
-<h3 id="ssl">SSL Certificate</h3>
+<h3 id="ssl">SSL 认证</h3>
 
-It's always a good idea to use SSL for Meteor applications (see the [Security Article](security.html#ssl) to find out why). Once you have a registered domain name, you'll need to generate an SSL certificate with a certificate authority for your domain.
+在 Meteor 应用中使用 SSL 总是一件好事(要了解为什么请阅读[安全性章节](security.html#ssl))。一旦你注册了一个域名，就会需要根据域名证书颁发机构生成一个 SSL 证书。
 
 <h3 id="cdn">CDN</h3>
 
-It's not strictly required, but often a good idea to set up a Content Delivery Network (CDN) for your site. A CDN is a network of servers that hosts the static assets of your site (such as JavaScript, CSS, and images) in numerous locations around the world and uses the server closest to your user to provide those files in order to speed up their delivery. For example, if the actual web server for your application is on the east coast of the USA and your user is in Australia, a CDN could host a copy of the JavaScript of the site within Australia or even in the city the user is in. This has huge benefits for the initial loading time of your site.
+虽然不是严格要求，但为你的网站建立内容分布网络(CDN)会是一个好主意。CDN 是托管网站静态资产(如 JavaScript, CSS, 和 images)的服务器网络，它分布在世界上各个地方，并使用最靠近用户的服务器为用户提供这些静态资产，目的是加速访问速度。例如，如果网站的服务器在 USA 的东海岸，而你的用户在澳大利亚，CDN 可以在澳大利亚，甚至在用户所在的城市托管一份该网站 JavaScript 的副本。这将极大缩短网址的初始加载时间。
 
 The basic way to use a CDN is to upload your files to the CDN and change your URLs to point at the CDN (for instance if your Meteor app is at `http://myapp.com`, changing your image URL from `<img src="http://myapp.com/cats.gif">` to `<img src="http://mycdn.com/cats.gif">`). However, this would be hard to do with Meteor, since the largest file – your Javascript bundle – changes every time you edit your app.
 
@@ -89,7 +89,7 @@ Template.registerHelper("assetUrl", (asset) => {
 <img src="{{assetUrl 'cats.gif'}}">
 ```
 
-<h4 id="cdn-webfonts">CDNs and webfonts</h4>
+<h4 id="cdn-webfonts">CDNs 和 webfonts</h4>
 
 If you are hosting a webfont as part of your application and serving it via a CDN, you may need to configure the served headers for the font to allow cross-origin resource sharing (as the webfont is now served from a different origin to your site itself). You can do this easily enough in Meteor by adding a handler (you'll need to ensure your CDN is passing the header through):
 
@@ -104,7 +104,7 @@ WebApp.rawConnectHandlers.use(function(req, res, next) {
 });
 ```
 
-And then for example with Cloudfront, you would:
+以 Cloudfront 为例，你将能够：
 
 - Select your distribution
 - Behavior tab
@@ -114,11 +114,11 @@ And then for example with Cloudfront, you would:
 - Add button
 - "Yes, Edit" button
 
-<h2 id="deployment-options">Deployment options</h2>
+<h2 id="deployment-options">部署选项</h2>
 
 Meteor is an open source platform, and you can run the apps that you make with Meteor anywhere just like regular Node.js applications. But operating Meteor apps *correctly*, so that your apps work for everyone, can be tricky if you are managing your infrastructure manually. This is why we recommend running production Meteor apps on Galaxy.
 
-<h3 id="galaxy">Galaxy (recommended)</h3>
+<h3 id="galaxy">Galaxy (推荐)</h3>
 
 The easiest way to operate your app with confidence is to use Galaxy, the service built by Meteor Development Group specifically to run Meteor apps.
 
@@ -144,7 +144,7 @@ Once you are setup with Galaxy, deployment is simple (just re-run the `meteor de
 
 <img src="images/galaxy-scaling.png">
 
-<h4 id="galaxy-mongo">MongoDB hosting services to use with Galaxy</h4>
+<h4 id="galaxy-mongo">一起使用的 MongoDB 托管环境</h4>
 
 If you are using Galaxy (or need a production quality, managed MongoDB for one of the other options listed here), it's usually a good idea to use a [MongoDB hosting provider](http://galaxy-guide.meteor.com/mongodb.html). There are a variety of options out there, but a good choice is [mLab](https://mlab.com/). The main things to look for are support for oplog tailing, and a presence in the us-east-1 or eu-west-1 AWS region.
 
@@ -154,7 +154,7 @@ If you are using Galaxy (or need a production quality, managed MongoDB for one o
 
 You can obtain a server running Ubuntu or Debian from many generic hosting providers. Mup can SSH into your server with the keys you provide in the config. You can also [watch this video](https://www.youtube.com/watch?v=WLGdXtZMmiI) for a more complete walkthrough on how to do it.
 
-<h3 id="custom-deployment">Custom deployment</h3>
+<h3 id="custom-deployment">定制化部署</h3>
 
 If you want to figure out your hosting solution completely from scratch, the Meteor tool has a command `meteor build` that creates a deployment bundle that contains a plain Node.js application. Any npm dependencies must be installed before issuing the `meteor build` command to be included in the bundle. You can host this application wherever you like and there are many options in terms of how you set it up and configure it.
 
@@ -176,7 +176,7 @@ MONGO_URL=mongodb://localhost:27017/myapp ROOT_URL=http://my-app.com node main.j
 
 However, unless you have a specific need to roll your own hosting environment, the other options here are definitely easier, and probably make for a better setup than doing everything from scratch. Operating a Meteor app in a way that it works correctly for everyone can be complex, and [Galaxy](#galaxy) handles a lot of the specifics like routing clients to the right containers and handling coordinated version updates for you.
 
-<h2 id="process">Deployment process</h2>
+<h2 id="process">部署步骤</h2>
 
 Although it's much easier to deploy a web application than release most other types of software, that doesn't mean you should be cavalier with your deployment. It's important to properly QA and test your releases before you push them live, to ensure that users don't have a bad experience, or even worse, data get corrupted.
 
@@ -190,11 +190,11 @@ It's a good idea to have a release process that you follow in releasing your app
 
 Steps 2. and 5. can be quite time-consuming, especially if you are aiming to maintain a high level of quality in your application. That's why it's a great idea to develop a suite of acceptance tests (see our [Testing Article](XXX) for more on this). To take things even further, you could run a load/stress test against your staging server on every release.
 
-<h3 id="continuous-deployment">Continuous deployment</h3>
+<h3 id="continuous-deployment">持续性部署</h3>
 
 Continuous deployment refers to the process of deploying an application via a continuous integration tool, usually when some condition is reached (such as a git push to the `master` branch). You can use CD to deploy to Galaxy, as Nate Strauser explains in a [blog post on the subject](https://medium.com/@natestrauser/migrating-meteor-apps-from-modulus-to-galaxy-with-continuous-deployment-from-codeship-aed2044cabd9#.lvio4sh4a).
 
-<h3 id="rolling-updates-and-data">Rolling deployments and data versions</h3>
+<h3 id="rolling-updates-and-data">滚动部署和数据版本</h3>
 
 It's important to understand what happens during a deployment, especially if your deployment involves changes in data format (and potentially data migrations, see the [Collections Article](collections.html#migrations)).
 
@@ -204,7 +204,7 @@ When you are running your app on multiple servers or containers, it's not a good
 
 If the new version involves different data formats in the database, then you need to be a little more careful about how you step through versions to ensure that all the versions that are running simultaneously can work together. You can read more about how to do this in the [collections article](collections.html#migrations).
 
-<h2 id="analytics">Monitoring users via analytics</h2>
+<h2 id="analytics">通过统计工具监控用户</h2>
 
 It's common to want to know which pages of your app are most commonly visited, and where users are coming from. Here's a simple setup that will get you URL tracking using Google Analytics. We'll be using the [`okgrow:analytics`](https://atmospherejs.com/okgrow/analytics) package.
 
@@ -246,15 +246,15 @@ export const updateText = new ValidatedMethod({
 
 To achieve a similar abstraction for subscriptions/publications, you may want to write a simple wrapper for `Meteor.subscribe()`.
 
-<h2 id="apm">Monitoring your application</h2>
+<h2 id="apm">监控应用</h2>
 
 When you are running an app in production, it's vitally important that you keep tabs on the performance of your application and ensure it is running smoothly.
 
-<h3 id="meteor-performance">Understanding Meteor performance</h3>
+<h3 id="meteor-performance">了解 Meteor 性能</h3>
 
 Although a host of tools exist to monitor the performance of HTTP, request-response based applications, the insights they give aren't necessarily useful for a connected client system like a Meteor application. Although it's true that slow HTTP response times would be a problem for your app, and so using a tool like [Pingdom](https://www.pingdom.com) can serve a purpose, there are many kinds of issues with your app that won't be surfaced by such tools.
 
-<h3 id="galaxy-apm">Monitoring with Galaxy</h3>
+<h3 id="galaxy-apm">使用 Galaxy 监控</h3>
 
 [Galaxy](#galaxy) offers turnkey Meteor hosting and provides tools that are useful to debug the current and past state of your application. CPU and Memory load graphs in combination with connected user counts can be vital to determining if your setup is handling the current load (or if you need more containers), or if there's some specific user action that's causing disproportionate load (if they don't seem to be correlated):
 
@@ -270,7 +270,7 @@ If you really want to understand the ins and outs of running your Meteor applica
 
 When you visit the Kadira application, you can view current and past behavior of your application over various useful metrics. Kadira's [documentation](https://kadira.io/platform/kadira-apm/overview) is extensive and invaluable, but we'll discuss a few key areas here.
 
-<h4 id="kadira-method-pub">Method and Publication Latency</h4>
+<h4 id="kadira-method-pub">Method 和 Publication 延迟</h4>
 
 Rather than monitoring HTTP response times, in a Meteor app it makes far more sense to consider DDP response times. The two actions your client will wait for in terms of DDP are *method calls* and *publication subscriptions*. Kadira includes tools to help you discover which of your methods and publications are slow and resource intensive.
 
@@ -285,7 +285,7 @@ You can also use the "traces" section to discover particular cases of the method
 In the above screenshot we're looking at a slower example of a method call (which takes 214ms), which, when we drill in further we see is mostly taken up waiting on other actions on the user's connection (principally waiting on the `searches/top` and `counts` publications). So we could consider looking to speed up the initial time of those subscriptions as they are slowing down searches a little in some cases.
 
 
-<h4 id="kadira-livequery">Livequery Monitoring</h4>
+<h4 id="kadira-livequery">现场查询监控</h4>
 
 A key performance characteristic of Meteor is driven by the behavior of livequery, the key technology that allows your publications to push changing data automatically in realtime. In order to achieve this, livequery needs to monitor your MongoDB instance for changes (by tailing the oplog) and decide if a given change is relevant for the given publication.
 
@@ -295,7 +295,7 @@ If the publication is used by a lot of users, or there are a lot of changes to b
 
 In this screenshot we can see that observers are fairly steadily created and destroyed, with a pretty low amount of reuse over time, although in general they don't survive for all that long. This would be consistent with the fact that we are looking at the `package` publication of Atmosphere which is started everytime a user visits a particular package's page. The behavior is more or less what we would expect so we probably wouldn't be too concerned by this information.
 
-<h2 id="seo">Enabling SEO</h2>
+<h2 id="seo">SEO</h2>
 
 If your application contains a lot of publicly accessible content, then you probably want it to rank well in Google and other search engines' indexes. As most webcrawlers do not support client-side rendering (or if they do, have spotty support for websockets), it's better to render the site on the server and deliver it as HTML in this special case.
 
