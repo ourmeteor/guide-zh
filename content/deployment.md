@@ -1,47 +1,47 @@
 ---
 title: 部署和监控
 order: 41
-description: How to deploy, run, and monitor your Meteor app in production.
+description: 如何部署，运行，监控 Meteor 产品应用。
 discourseTopicId: 19668
 ---
 
-After reading this guide, you'll know:
+读完全文，你将能够：
 
-1. What to consider before you deploy a Meteor application.
-2. How to deploy to some common Meteor hosting environments.
-3. How to design a deployment process to make sure your application's quality is maintained.
-4. How to monitor user behavior with analytics tools.
-5. How to monitor your application with Kadira.
-6. How to make sure your site is discoverable by search engines.
+1. 在部署一个 Meteor 应用之前应该考虑什么？
+2. 如何部署到一些常见的 Meteor 应用托管环境。
+3. 如何设计一个部署过程，以确保能够维护应用的质量。
+4. 如何使用统计工具监控用户行为。
+5. 如何使用 Kadira 监控你的应用。
+6. 如何确保你的网站可以被搜索引擎收录。
 
-<h2 id="deploying">Deploying Meteor Applications</h2>
+<h2 id="deploying">部署 Meteor 应用</h2>
 
-Once you've built and tested your Meteor application, you need to put it online to show it to the world. Deploying a Meteor application is similar to deploying any other websocket-based Node.js app, but is different in some of the specifics.
+你建立了一个 Meteor 应用，并且通过了测试，现在是时候把它放到网上让全世界人民欣赏了。部署一个 Meteor 应用跟部署其他 websocket-based Node.js 应用类似，但在某些方面存在不同。
 
-Deploying a web application is fundamentally different to releasing most other kinds of software, in that you can deploy as often as you'd like to. You don't need to wait for users to do something to get the new version of your software because the server will push it right at them.
+部署一个应用跟大部分的发行软件有本质上的区别，我们可以多次部署。不需要等待用户换取软件的新版本，因为服务器会把更新的信息推送给用户。
 
-However, it's still important to test your changes throughly with a good process of Quality Assurance (QA). Although it's easy to push out fixes to bugs, those bugs can still cause major problems to users and even potentially data corruption!
+使用优秀的质量保证(QA)流程对更改进行测试仍然是非常重要的。即使修复 bugs 很容易，这些错误仍然可能给客户造成严重困扰，并可能导致数据丢失！
 
-<h3 id="environments">Deployment environments</h3>
+<h3 id="environments">部署环境</h3>
 
-In web application deployment it's common to refer to three runtime environments:
+在 web 应用部署中最常见的三种运行环境：
 
-1. **Development.** This refers to your machine where you develop new features and run local tests.
-2. **Staging.** An intermediate environment that is similar to production, but not visible to users of the application. Can be used for testing and QA.
-3. **Production.** The real deployment of your app that your customers are currently using.
+1. **Development.** 开发环境，这是指你开发新功能和运行本地测试的机器。
+2. **Staging.** 中间环境，类似于 Production，但对应用的用户不可见。可以用于测试和 QA.
+3. **Production.** 生产环节，用户使用中的 app 的真实部署环境。
 
-The idea of the staging environment is to provide a non-user-visible test environment that is as close as possible to production in terms of infrastructure. It's common for issues to appear with new code on the production infrastructure that just don't happen in a development environment. A very simple example is issues that involve latency between the client and server---connecting to a local development server with tiny latencies, you just may never see such an issue.
+中间环境主要是为了提供一个用户不可见的测试环境，在框架上跟真实部署环境无限接近。新代码在开发环境中不会出现问题，但到了真实生产环节中就出问题了。以客户端和服务器端之间的延迟问题为例 —— 连接到本地开发服务器，这么小的延迟你可能都不会将它当作一个问题。
 
-For this reason, developers tend to try and get staging as close as possible to production. This means that all the steps we outline below about production deployment, should, if possible, also be followed for your staging server.
+因为这个原因，开发者会尽量让中间环节接近实际的生产环节。这意味着我们下面提到的在生产环节部署的步骤，也非常适用于中间环境。
 
-<h3 id="environment">Environment variables and settings</h3>
+<h3 id="environment">环境变量和设置</h3>
 
-There are two main ways to configure your application outside of the code of the app itself:
+代码之外有两种方式配置你的应用：
 
-1. **Environment variables.** This is the set of `ENV_VARS` that are set on the running process.
-2. **Settings.** These are in a JSON object set via either the `--settings` Meteor command-line flag or stringified into the `METEOR_SETTINGS` environment variable.
+1. **Environment variables.** 环境变量，这是运行过程中需要设置的一系列 `ENV_VARS`.
+2. **Settings.** 设置，位于 JSON 对象中，通过 Meteor 命令 `--settings` 设置或字符串化到 `METEOR_SETTINGS` 环境变量。
 
-Settings should be used to set environment (i.e. staging vs production) specific things, like the access token and secret used to connect to Google. These settings will not change between any given process running your application in the given environment.
+设置用于设置环境(中间环境或生产环境)中具体事项，例如用于连接谷歌的访问标志和密钥。在特定环境中运行应用时这些设置不会改变
 
 Environment variables are used to set process specific things, which could conceivably change for different instances of your application's processes. For instance, you can set a different `KADIRA_OPTIONS_HOSTNAME` for each process to ensure that [kadira](#kadira) logs timings with useful hostnames.
 
