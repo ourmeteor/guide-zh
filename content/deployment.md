@@ -120,27 +120,27 @@ Meteor 是一个开源平台，跟 regular Node.js 应用一样，你可以在�
 
 <h3 id="galaxy">Galaxy (推荐)</h3>
 
-The easiest way to operate your app with confidence is to use Galaxy, the service built by Meteor Development Group specifically to run Meteor apps.
+部署你的应用最简单的就是使用 Galaxy, Galaxy 是 Meteor Development Group 建立的专门用于部署 Meteor 应用的。
 
-Galaxy is a distributed system that runs on Amazon AWS. If you understand what it takes to run Meteor apps correctly and just how Galaxy works, you’ll come to appreciate Galaxy’s value, and that it will save you a lot of time and trouble. Most large Meteor apps run on Galaxy today, and many of them have switched from custom solutions they used prior to Galaxy’s launch.
+Galaxy 是在 Amazon AWS 上运行的分布式系统。如果你了解 Galaxy 是如何工作以及如何正确运行 Meteor 应用的，你一定会体会到 Galaxy 的价值，Galaxy 可以节约大量的时间和避免不必要的麻烦。目前很多大型 Meteor 应用都是在 Galaxy 上运行，其中很多都是从定制化的部署方案转换到 Galaxy.
 
-In order to deploy to Galaxy, you'll need to [sign up for an account](https://www.meteor.com/galaxy/signup), and separately provision a MongoDB database (see below).
+如果要在 Galaxy 上部署，需要[注册一个账号](https://www.meteor.com/galaxy/signup),并分开提供 MongoDB 数据库(参考下文)。
 
-Once you've done that, it's easy to [deploy to Galaxy](http://galaxy-guide.meteor.com/deploy-guide.html). You just need to [add some environment variables to your settings file](http://galaxy-guide.meteor.com/environment-variables.html) to point it at your MongoDB, and you can deploy with:
+注册好账号后，[部署到 Galaxy](http://galaxy-guide.meteor.com/deploy-guide.html)就很简单了。只需要[在设置文件中添加环境变量](http://galaxy-guide.meteor.com/environment-variables.html)指向你的 MongoDB, 然后就可以根据下面的命令部署了：
 
 ```bash
 DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy your-app.com --settings production-settings.json
 ```
 
-In order for Galaxy to work with your custom domain (`your-app.com` in this case), you need to [set up your DNS to point at Galaxy](http://galaxy-guide.meteor.com/dns.html). Once you've done this, you should be able to reach your site from a browser.
+为了让 你的域名(在这个例子中是 `your-app.com`)在 Galaxy 也可以工作，你需要[设置 DNS 指向 Galaxy](http://galaxy-guide.meteor.com/dns.html)。完成之后，就应该可以通过浏览器访问你的网站。
 
-You can also log into the Galaxy UI at https://galaxy.meteor.com. Once there you can manage your applications, monitor the number of connections and resource usage, view logs, and change settings.
+你也可以通过 https://galaxy.meteor.com 进入 Galaxy UI,在 Galaxy UI 可以管理你的应用，监控连接数和资源使用，查看日志，更改设置。
 
 <img src="images/galaxy-org-dashboard.png">
 
-If you are following [our advice](security.html#ssl), you'll probably want to [set up SSL](http://galaxy-guide.meteor.com/encryption.html) on your Galaxy application with the certificate and key for your domain. The key things here are to add the `force-ssl` package and to use the Galaxy UI to add your SSL certificate.
+如果你根据[我们的建议](security.html#ssl)，你可能会想要在 Galaxy 应用上通过域名的证书和密钥[设置 SSL](http://galaxy-guide.meteor.com/encryption.html)。这里的关键点是添加 `force-ssl` 包，并通过 Galaxy UI 添加 SSL 证书。
 
-Once you are setup with Galaxy, deployment is simple (just re-run the `meteor deploy` command above), and scaling is even easier---simply log into galaxy.meteor.com, and scale instantly from there.
+一旦设置好 Galaxy, 部署就很简单了(重新运行上面的 `meteor deploy` 命令)，监控就更简单了 —— 登入 galaxy.meteor.com, 在那里就可以监控。
 
 <img src="images/galaxy-scaling.png">
 
