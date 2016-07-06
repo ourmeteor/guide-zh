@@ -61,23 +61,23 @@ discourseTopicId: 19668
 
 <h3 id="cdn">CDN</h3>
 
-虽然不是严格要求，但为你的网站建立内容分布网络(CDN)会是一个好主意。CDN 是托管网站静态资产(如 JavaScript, CSS, 和 images)的服务器网络，它分布在世界上各个地方，并使用最靠近用户的服务器为用户提供这些静态资产，目的是加速访问速度。例如，如果网站的服务器在 USA 的东海岸，而你的用户在澳大利亚，CDN 可以在澳大利亚，甚至在用户所在的城市托管一份该网站 JavaScript 的副本。这将极大缩短网址的初始加载时间。
+虽然不是严格要求，但为你的网站建立内容分布网络(CDN)会是一个好主意。CDN 是托管网站静态资产(如 JavaScript, CSS, 和 images)的服务器网络，它分布在世界上各个地方，并使用最靠近用户的服务器为用户提供这些静态资产，目的是加速访问速度。例如，如果网站的服务器在 USA 的东海岸，而你的用户在澳大利亚，CDN 可以在澳大利亚，甚至在用户所在的城市托管一份该网站 JavaScript 的副本。这将极大缩短网站的初始加载时间。
 
-The basic way to use a CDN is to upload your files to the CDN and change your URLs to point at the CDN (for instance if your Meteor app is at `http://myapp.com`, changing your image URL from `<img src="http://myapp.com/cats.gif">` to `<img src="http://mycdn.com/cats.gif">`). However, this would be hard to do with Meteor, since the largest file – your Javascript bundle – changes every time you edit your app.
+CDN 最基本的语法就是把文件上传到 CDN 并改变 URL 指向 CDN (例如你的 Meteor 应用位于 `http://myapp.com`，则将图片的 URL 从 `<img src="http://myapp.com/cats.gif">` 改为 `<img src="http://mycdn.com/cats.gif">`). 但是这对于 Meteor 来说有点困难，因为最大的文件夹 —— Javascript 组件会因为你更改应用而经常改变。
 
-For Meteor, we recommend using a CDN with "origin" support (like [CloudFront](http://joshowens.me/using-a-cdn-with-your-production-meteor-app/)), which means that instead of uploading your files in advance, the CDN automatically fetches them from your server. You put your files in `public/` (in this case `public/cats.gif`), and when your Australian user asks the CDN for `http://mycdn.com/cats.gif`, the CDN, behind the scenes, fetches `http://myapp.com/cats.gif` and then delivers it to the user. While this is slightly slower than getting `http://myapp.com/cats.gif` directly, it only happens one time, because the CDN saves the file, and all subsequent Australians who ask for the file get it quickly.
+对于 Meteor 来讲，我们推荐使用内部支持的 CDN (例如 [CloudFront](http://joshowens.me/using-a-cdn-with-your-production-meteor-app/))，跟提前上传文件相比，CDN 自动从你的服务器获取文件。你把文件放在 `public/` 文件夹(在这个例子中是 `public/cats.gif`)，这样当澳大利亚的用户通过 CDN 访问 `http://mycdn.com/cats.gif` 时，CDN 会访问 `http://myapp.com/cats.gif` 获取文件然后发送给用户。虽然这比直接访问 `http://myapp.com/cats.gif` 获取文件会慢一点，但这只会发生一次，因为 CDN 会保存这些文件，接下来澳大利亚用户访问都可以快速获取文件。
 
-To get Meteor to use the CDN for your Javascript and CSS bundles, call `WebAppInternals.setBundledJsCssPrefix("http://mycdn.com")` on the server. This will also take care of relative image URLs inside your CSS files. If you need to use a dynamic prefix, you can return the prefix from a function passed to `WebAppInternals.setBundledJsCssUrlRewriteHook()`.
+让 Meteor 使用 CDN 存储 Javascript 和 CSS 文件需要在服务器调用 `WebAppInternals.setBundledJsCssPrefix("http://mycdn.com")`。这也会包含 CSS 文件中包含的图片 URL。如果你需要使用动态前缀，可以从一个函数返回前缀并传递给 `WebAppInternals.setBundledJsCssUrlRewriteHook()`.
 
-For all your files in `public/`, change their URLs to point at the CDN. You can use a helper like `assetUrl`.
+对于文件夹 `public/` 中的所有文件，将它们的 URL 指向 CDN. 可以使用名为 `assetUrl` 的helper.
 
-Before:
+原始文件:
 
 ```html
 <img src="http://myapp.com/cats.gif">
 ```
 
-After:
+URL 指向 CDN:
 
 ```js
 Template.registerHelper("assetUrl", (asset) => {
@@ -91,7 +91,7 @@ Template.registerHelper("assetUrl", (asset) => {
 
 <h4 id="cdn-webfonts">CDNs 和 webfonts</h4>
 
-If you are hosting a webfont as part of your application and serving it via a CDN, you may need to configure the served headers for the font to allow cross-origin resource sharing (as the webfont is now served from a different origin to your site itself). You can do this easily enough in Meteor by adding a handler (you'll need to ensure your CDN is passing the header through):
+如果你的应用中包含网络字体并通过CDN获取，您可能需要配置字体的 header，以允许跨域资源共享(因为网络字体来自于你的网站之外的其他地方)。在 Meteor 可以通过添加一个 handler 轻松做到(你必须确保 CDN 遍历 header):
 
 ```js
 import { WebApp } from 'meteor/webapp';
@@ -116,7 +116,7 @@ WebApp.rawConnectHandlers.use(function(req, res, next) {
 
 <h2 id="deployment-options">部署选项</h2>
 
-Meteor is an open source platform, and you can run the apps that you make with Meteor anywhere just like regular Node.js applications. But operating Meteor apps *correctly*, so that your apps work for everyone, can be tricky if you are managing your infrastructure manually. This is why we recommend running production Meteor apps on Galaxy.
+Meteor 是一个开源平台，跟 regular Node.js 应用一样，你可以在上面运行 Meteor 应用。如果你要自己管理基础架构，并让 Meteor 应用正确运行，让所有人都可以使用，还是一件蛮棘手的事。这也是为什么我们推荐在 Galaxy 上部署 Meteor 应用。
 
 <h3 id="galaxy">Galaxy (推荐)</h3>
 
