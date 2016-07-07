@@ -146,27 +146,27 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy your-app.com --
 
 <h4 id="galaxy-mongo">一起使用的 MongoDB 托管环境</h4>
 
-If you are using Galaxy (or need a production quality, managed MongoDB for one of the other options listed here), it's usually a good idea to use a [MongoDB hosting provider](http://galaxy-guide.meteor.com/mongodb.html). There are a variety of options out there, but a good choice is [mLab](https://mlab.com/). The main things to look for are support for oplog tailing, and a presence in the us-east-1 or eu-west-1 AWS region.
+如果你正在使用 Galaxy(或者使用下面提到的服务，并需要管理 MongoDB),建议使用[MongoDB 托管服务](http://galaxy-guide.meteor.com/mongodb.html)。可以有很多种选择，但我们推荐[mLab](https://mlab.com/)。需要支持 oplog tailing，并且存在于 AWS 的 us-east-1 或 eu-west-1 区域。
 
 <h3 id="mup">Meteor Up</h3>
 
-[Meteor Up X](https://github.com/arunoda/meteor-up/tree/mupx), often referred to as "mupx", is an open source tool that can be used to deploy Meteor application to any online server over SSH. Mup handles some of the essential deployment requirements, but you will still need to do a lot of work to get your load balancing and version updates working smoothly - it's essentially a way to automate the manual steps of using `meteor build` and putting that bundle on your server.
+[Meteor Up X](https://github.com/arunoda/meteor-up/tree/mupx)，也被叫做 "mupx",是一个开源工具可以通过 SSH 用来部署 Meteor 应用到任何在线服务器。Mup 可以满足一些关键的部署条件，但你还是需要做很多工作确保加载平衡和版本更新工作可以顺利进行 —— 实质上就是将 `meteor build` 这一步自动化，并将组件放在服务器上。
 
-You can obtain a server running Ubuntu or Debian from many generic hosting providers. Mup can SSH into your server with the keys you provide in the config. You can also [watch this video](https://www.youtube.com/watch?v=WLGdXtZMmiI) for a more complete walkthrough on how to do it.
+你可以从很多通用的托管服务商获取在 Ubuntu 或 Debian 上运行的服务器。Mup 可以通过你在配置中提供的密钥 SSH 到你的服务器。请[观看该视频](https://www.youtube.com/watch?v=WLGdXtZMmiI)了解更完整的操作。
 
 <h3 id="custom-deployment">定制化部署</h3>
 
-If you want to figure out your hosting solution completely from scratch, the Meteor tool has a command `meteor build` that creates a deployment bundle that contains a plain Node.js application. Any npm dependencies must be installed before issuing the `meteor build` command to be included in the bundle. You can host this application wherever you like and there are many options in terms of how you set it up and configure it.
+如果你想从头开始完全弄清楚你的托管解决方案，Meteor 通过命令行 `meteor build` 创建一个包含一个简单 Node.js 应用的部署组件。在执行 `meteor build` 前需要先安装 npm 所依赖的任何组件。你可以按照自己喜欢的方式托管你的应用，从设置和配置方面来讲是有很多选择的。
 
-**NOTE** it's important that you build your bundle for the correct architecture. If you are building on your development machine, there's a good chance you are deploying to a different server architecture. You'll want to specify the correct architecture with `--architecture`:
+**注意** 在正确的架构上构建你的组件是很重要的。如果在自己部署的机器上构建，有很大可能会部署到其他服务器架构上。你会需要使用 `--architecture` 指定正确的架构：
 
 ```bash
-# for example if deploying to a Ubuntu linux server:
+# 例如部署到 Ubuntu linux 服务器：
 npm install --production
 meteor build /path/to/build --architecture os.linux.x86_64
 ```
 
-To run this application, you need to provide Node.js 0.10.x and a MongoDB server. The current release of Meteor has been tested with Node 0.10.43. You can then run the application by invoking `node`, a ROOT_URL, and the MongoDB endpoint.
+运行该应用需要提供 Node.js 0.10.x 和 MongoDB 服务器。最新发布的 Meteor 已经通过 Node 0.10.43 测试。然后通过调用 `node`, ROOT_URL, 和 MongoDB 就可以运行该应用。
 
 ```bash
 cd my_directory
@@ -174,21 +174,21 @@ cd my_directory
 MONGO_URL=mongodb://localhost:27017/myapp ROOT_URL=http://my-app.com node main.js
 ```
 
-However, unless you have a specific need to roll your own hosting environment, the other options here are definitely easier, and probably make for a better setup than doing everything from scratch. Operating a Meteor app in a way that it works correctly for everyone can be complex, and [Galaxy](#galaxy) handles a lot of the specifics like routing clients to the right containers and handling coordinated version updates for you.
+除非你有特殊需求，需要推出自己的托管环境，不然这里的其他选择都是很简单的，也比什么都从头开始构建会有一个更好的起点。正确运行一个 Meteor 应用并让所有人都可以访问有时会很困难，[Galaxy](#galaxy)可以处理很多具体工作，比如通过路由链接客户端到正确的 containers, 并能够处理协调版本。
 
 <h2 id="process">部署步骤</h2>
 
-Although it's much easier to deploy a web application than release most other types of software, that doesn't mean you should be cavalier with your deployment. It's important to properly QA and test your releases before you push them live, to ensure that users don't have a bad experience, or even worse, data get corrupted.
+虽然部署一个 web 应用比大多数的软件发布简单，但也不能掉以轻心。在正式发布前需要做 QA 和测试以确保用户体验良好，避免数据损害这种糟糕的情况。
 
-It's a good idea to have a release process that you follow in releasing your application. Typically that process looks something like:
+发布应用程序时遵循一个发布步骤将会是一个好主意。常见发布步骤我们按点列出：
 
-1. Deploy the new version of the application to your staging server.
-2. QA the application on the staging server.
-3. Fix any bugs found in step 2. and repeat.
-4. Once you are satisfied with the staging release, release the *exact same* version to production.
-5. Run final QA on production.
+1. 将新版本的应用部署到中间环境。
+2. 在中间环境进行QA
+3. 修复步骤二中发现的 bug，然后重新执行步骤二。
+4. 如果你对中间环境部署的应用满意了，可以部署到生产环境。
+5. 在生产环节进行 QA.
 
-Steps 2. and 5. can be quite time-consuming, especially if you are aiming to maintain a high level of quality in your application. That's why it's a great idea to develop a suite of acceptance tests (see our [Testing Article](XXX) for more on this). To take things even further, you could run a load/stress test against your staging server on every release.
+步骤二和步骤五可能会非常耗时，特别是当你想让应用保持高质量的时候。这就是为什么我们会需要开发一套验收测试 (阅读[测试文章](XXX) 了解更多)。更进一步说，你可以在每次发布新版本时在临时服务器进行负载/压力测试。
 
 <h3 id="continuous-deployment">持续性部署</h3>
 
