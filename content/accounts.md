@@ -1,21 +1,21 @@
 ---
 title: Users and Accounts
 order: 13
-description: How to build user login functionality into a Meteor app. Let your users log in with passwords, Facebook, Google, GitHub, and more.
+description: 如何在 Meteor 应用中建立用户登录系统。用户可以通过密码，Facebook, Google, GitHub 等登录。
 discourseTopicId: 19664
 ---
 
-After reading this article, you'll know:
+阅读完本文，你将能够：
 
-1. What features in core Meteor enable user accounts
-1. How to use accounts-ui for a quick prototype
-1. How to use the useraccounts family of packages to build your login UI
-1. How to build a fully-featured password login experience
-1. How to enable login through OAuth providers like Facebook
-1. How to add custom data to Meteor's users collection
-1. How to manage user roles and permissions
+1. 应用的用户账号有哪些核心功能
+1. 如何使用 accounts-ui 快速建立原型
+1. 如何使用 useraccounts 众多的包建立登录 UI.
+1. 如何建立一个全功能的秘密登录系统
+1. 如何通过 OAuth 供应商如 Facebook 实现登录
+1. 如何添加定制化数据到 Meeteor 用户集
+1. 如何管理用户角色和权限
 
-<h2 id="core-meteor">Features in core Meteor</h2>
+<h2 id="core-meteor">Meteor 核心特点</h2>
 
 Before we get into all of the different user-facing accounts functionality you can add with Meteor, let's go over some of the features built into the Meteor DDP protocol and `accounts-base` package. These are the parts of Meteor that you'll definitely need to be aware of if you have any user accounts in your app; most of everything else is optional and added/removed via packages.
 
