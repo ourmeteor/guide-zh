@@ -192,26 +192,26 @@ MONGO_URL=mongodb://localhost:27017/myapp ROOT_URL=http://my-app.com node main.j
 
 <h3 id="continuous-deployment">持续性部署</h3>
 
-Continuous deployment refers to the process of deploying an application via a continuous integration tool, usually when some condition is reached (such as a git push to the `master` branch). You can use CD to deploy to Galaxy, as Nate Strauser explains in a [blog post on the subject](https://medium.com/@natestrauser/migrating-meteor-apps-from-modulus-to-galaxy-with-continuous-deployment-from-codeship-aed2044cabd9#.lvio4sh4a).
+持续性部署是指在一定条件下，使用持续集成工具部署应用的过程(就像使用 git push 命令推送到 `master` 分支)。你可以使用 CD 命令部署到 Galaxy,[博客文章的主题](https://medium.com/@natestrauser/migrating-meteor-apps-from-modulus-to-galaxy-with-continuous-deployment-from-codeship-aed2044cabd9#.lvio4sh4a).
 
 <h3 id="rolling-updates-and-data">滚动部署和数据版本</h3>
 
-It's important to understand what happens during a deployment, especially if your deployment involves changes in data format (and potentially data migrations, see the [Collections Article](collections.html#migrations)).
+理解部署中发生了什么事是很重要的，特别是当部署涉及到数据格式改变(和潜在的数据迁移，查看[集合章节](collections.html#migrations))。
 
-When you are running your app on multiple servers or containers, it's not a good idea to shut down all of the servers at once and then start them all back up again. This will result in more downtime than necessary, and will cause a huge spike in CPU usage when all of your clients reconnect again at the same time. To alleviate this, Galaxy stops and re-starts containers one by one during deployment. There will be a time period during which some containers are running the old version and some the new version, as users are migrated incrementally to the new version of your app.
+当在多个服务器或容器上运行你的应用，最好不要一次性关闭所有服务器然后再重新打开备份。这样做停机时间会更长，而且当所有用户再次同时连接时会导致 CPU 使用率急剧上升。为了缓和这种情况，Galaxy 在部署的时候会将一个容器停止和重启，然后进行下一个容器的停止和重启。会有一段时间一些容器在旧版本上运行，一些容器在新版本上运行，用户逐渐从旧版本切换到新版本。
 
 <img src="images/galaxy-deploying.png">
 
-If the new version involves different data formats in the database, then you need to be a little more careful about how you step through versions to ensure that all the versions that are running simultaneously can work together. You can read more about how to do this in the [collections article](collections.html#migrations).
+如果新版本在数据库中包含不同的数据格式，那么需要多加小心，通过如何加强版本以确保所有同时运行的版本可以一起工作。了解应该如何操作请阅读[集合章节](collections.html#migrations)。
 
 <h2 id="analytics">通过统计工具监控用户</h2>
 
-It's common to want to know which pages of your app are most commonly visited, and where users are coming from. Here's a simple setup that will get you URL tracking using Google Analytics. We'll be using the [`okgrow:analytics`](https://atmospherejs.com/okgrow/analytics) package.
+我们经常想知道的是应用程序的哪个页面访问量最大，访客的来源。通过简单的设置可以使用 Google Analytics 跟踪 URL.我们会使用这个包[`okgrow:analytics`](https://atmospherejs.com/okgrow/analytics)
 
 ```
 meteor add okgrow:analytics
 ```
-Now, we need to configure the package with our Google Analytics key (the package also supports a large variety of other providers, check out the [documentation on Atmosphere](https://atmospherejs.com/okgrow/analytics)). Pass it in as part of [_Meteor settings_](#environment):
+现在我们需要使用 Google Analytics key 配置包(该包除了支持 Google Analytics, 也支持其他类似工具，查看[Atmosphere 文档](https://atmospherejs.com/okgrow/analytics)). 作为 [_Meteor settings_](#environment) 的一部分进行传递：
 
 ```js
 {
@@ -224,9 +224,9 @@ Now, we need to configure the package with our Google Analytics key (the package
 }
 ```
 
-The analytics package hooks into Flow Router (see the [routing article](routing.html) for more) and records all of the page events for you.
+这个统计包 hook 进 Flow Router (阅读[路由章节](routing.html)了解更多) 并记录所有的页面事件。
 
-You may want to track non-page change related events (for instance publication subscription, or method calls) also. To do so you can use the custom event tracking functionality:
+你可能还需要记录页面没有发生变化的事件 (例如发布订阅，或者调用方法)，要实现这个功能可以改变事件追踪函数：
 
 ```js
 export const updateText = new ValidatedMethod({
@@ -244,7 +244,7 @@ export const updateText = new ValidatedMethod({
 });
 ```
 
-To achieve a similar abstraction for subscriptions/publications, you may want to write a simple wrapper for `Meteor.subscribe()`.
+为了实现 subscriptions/publications 的抽象化，你可能会需要为 `Meteor.subscribe()` 写一个简单的封装包。
 
 <h2 id="apm">监控应用</h2>
 
