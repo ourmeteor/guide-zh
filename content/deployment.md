@@ -1,7 +1,7 @@
 ---
 title: 部署和监控
 order: 41
-description: 如何部署，运行，监控 Meteor 产品应用。
+description: 如何在生产环境中部署，运行，监控 Meteor 产品应用。
 discourseTopicId: 19668
 ---
 
@@ -248,31 +248,31 @@ export const updateText = new ValidatedMethod({
 
 <h2 id="apm">监控应用</h2>
 
-When you are running an app in production, it's vitally important that you keep tabs on the performance of your application and ensure it is running smoothly.
+在生产环境中运行应用时，确保性能良好和保证顺利运行是非常重要的。
 
 <h3 id="meteor-performance">了解 Meteor 性能</h3>
 
-Although a host of tools exist to monitor the performance of HTTP, request-response based applications, the insights they give aren't necessarily useful for a connected client system like a Meteor application. Although it's true that slow HTTP response times would be a problem for your app, and so using a tool like [Pingdom](https://www.pingdom.com) can serve a purpose, there are many kinds of issues with your app that won't be surfaced by such tools.
+尽管有很多工具可以用于监控应用的 HTTP 请求 —— 回应性能，但是对于 Meteor 应用来说不一定有用。缓慢的 HTTP 回应对一个应用来说确实是一个问题，所有使用类似[Pingdom](https://www.pingdom.com)的根据可以解决一些问题，但你的应用可能还存在其他问题是这些工具无法解决的。
 
 <h3 id="galaxy-apm">使用 Galaxy 监控</h3>
 
-[Galaxy](#galaxy) offers turnkey Meteor hosting and provides tools that are useful to debug the current and past state of your application. CPU and Memory load graphs in combination with connected user counts can be vital to determining if your setup is handling the current load (or if you need more containers), or if there's some specific user action that's causing disproportionate load (if they don't seem to be correlated):
+[Galaxy](#galaxy) 提供 turnkey Meteor 托管和其他一些非常有用的工具用于 debug. 如果你的设置是用于处理当前负载(或者你需要更多容器)，决定设置的关键将是 CPU，内存负载图和连接用户数，或者一些不相称的用户过载行为(看起来不相关)：
 
 <img src="images/galaxy-metrics.png">
 
-Galaxy's UI provides a detailed logging system, which can be invaluable to determine which action it is causing that extra load, or to generally debug other application issues:
+Galaxy's UI提供了详细的登录系统，这在决定哪种行为造成了过高负载，或者用于应用的 debug 是非常有用的：
 
 <img src="images/galaxy-logs.png">
 
 <h3 id="kadira">Kadira</h3>
 
-If you really want to understand the ins and outs of running your Meteor application, you should give [Kadira](https://kadira.io) a try. Kadira is a full featured Application Performance Monitoring (APM) solution that's built from the ground up for Meteor. Kadira operates by taking regular client and server side observations of your application's performance as it conducts various activities and reporting them back to a master server.
+如果你真的想知道运行 Meteor 应用的来龙去脉，可以尝试[Kadira](https://kadira.io)。Kadira 是专为 Meteor 建造的全功能应用性能监控(APM)解决方案。Kadira 在应用运行时会监控和观察客户端和服务器端，然后把发生的行为发送给主服务器。
 
-When you visit the Kadira application, you can view current and past behavior of your application over various useful metrics. Kadira's [documentation](https://kadira.io/platform/kadira-apm/overview) is extensive and invaluable, but we'll discuss a few key areas here.
+当访问 Kadira 应用时，可以从多个指标观察你的应用过去和现在的行为。Kadira's [文档](https://kadira.io/platform/kadira-apm/overview)非常全面非常有价值，我们在这里只讨论几点。
 
 <h4 id="kadira-method-pub">Method 和 Publication 延迟</h4>
 
-Rather than monitoring HTTP response times, in a Meteor app it makes far more sense to consider DDP response times. The two actions your client will wait for in terms of DDP are *method calls* and *publication subscriptions*. Kadira includes tools to help you discover which of your methods and publications are slow and resource intensive.
+与其监控 HTTP 回应时间，在 Meteor 应用中监控 DDP 回应时间会更有价值。根据 DDP,客户端会等待的行为包括 *method calls* 和 *publication subscriptions*. Kadira 提供根据帮助你发现哪些 methods 和 publications 非常慢以及占用资源。
 
 <img src="images/kadira-method-latency.png">
 
