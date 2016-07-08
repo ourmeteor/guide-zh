@@ -272,32 +272,32 @@ Galaxy's UI提供了详细的登录系统，这在决定哪种行为造成了过
 
 <h4 id="kadira-method-pub">Method 和 Publication 延迟</h4>
 
-与其监控 HTTP 回应时间，在 Meteor 应用中监控 DDP 回应时间会更有价值。根据 DDP,客户端会等待的行为包括 *method calls* 和 *publication subscriptions*. Kadira 提供根据帮助你发现哪些 methods 和 publications 非常慢以及占用资源。
+与其监控 HTTP 响应时间，在 Meteor 应用中监控 DDP 响应时间会更有价值。根据 DDP,客户端会等待的行为包括 *method calls* 和 *publication subscriptions*. Kadira 提供根据帮助你发现哪些 methods 和 publications 非常慢以及占用资源。
 
 <img src="images/kadira-method-latency.png">
 
-In the above screenshot you can see the response time breakdown of the various methods commonly called by the Atmosphere application. The median time of 56ms and 99th percentile time of 200ms seems pretty reasonable, and doesn't seem like too much of a concern
+在上面的截图中可以看到 Atmosphere 应用调用不同 method 的响应时间分解。中值是 56ms, 99% 在200ms 以内，看起来很合理，不必过分担心。
 
-You can also use the "traces" section to discover particular cases of the method call that are particular slow:
+使用 "traces" section 可以发现哪些 Method 的调用执行非常缓慢： 
 
 <img src="images/kadira-method-trace.png">
 
-In the above screenshot we're looking at a slower example of a method call (which takes 214ms), which, when we drill in further we see is mostly taken up waiting on other actions on the user's connection (principally waiting on the `searches/top` and `counts` publications). So we could consider looking to speed up the initial time of those subscriptions as they are slowing down searches a little in some cases.
+在上面的截图中我们看到一个很慢的 method 调用(用了214ms)，我们深入研究，发现大部分时间用于等待用户连接行为(主要是 `searches/top` 和 `counts` publications)。所有我们会考虑加速 subscriptions 的初始化时间，因为在某些情况下它会使搜索变慢。
 
 
 <h4 id="kadira-livequery">现场查询监控</h4>
 
-A key performance characteristic of Meteor is driven by the behavior of livequery, the key technology that allows your publications to push changing data automatically in realtime. In order to achieve this, livequery needs to monitor your MongoDB instance for changes (by tailing the oplog) and decide if a given change is relevant for the given publication.
+Meteor 的主要性能特点是通过 livequery 行为实现的，livequery 允许通过 publications 实现数据实时自动更新。为了达到这个目的，livequery 需要监控你的 MongoDB 实例来监控变化并决定这种变化是否跟给定的 publication 相关。
 
-If the publication is used by a lot of users, or there are a lot of changes to be compared, then these livequery observers can do a lot of work. So it's immensely useful that Kadira can tell you some statistics about your livequery usage:
+如果很多用户使用同一个 publication，或者有很多变化需要比较，那么 livequery 将帮忙做很多工作。所以 Kadira 提供的停机 livequery 使用情况的功能非常有用：
 
 <img src="images/kadira-observer-usage.png">
 
-In this screenshot we can see that observers are fairly steadily created and destroyed, with a pretty low amount of reuse over time, although in general they don't survive for all that long. This would be consistent with the fact that we are looking at the `package` publication of Atmosphere which is started everytime a user visits a particular package's page. The behavior is more or less what we would expect so we probably wouldn't be too concerned by this information.
+在这张截图上我们可以看到 observers 的创建和销毁都相当稳定，少些会循环使用，但实际上它们并不会持久存在。这跟用户在 Atmosphere 上访问特定的页面， `package` publication 页面会重新加载是一样的。这张行为在外面的意料之中，所以我们也无需过多关注。
 
 <h2 id="seo">SEO</h2>
 
-If your application contains a lot of publicly accessible content, then you probably want it to rank well in Google and other search engines' indexes. As most webcrawlers do not support client-side rendering (or if they do, have spotty support for websockets), it's better to render the site on the server and deliver it as HTML in this special case.
+如果你的应用包含了很多可以公开访问的内容，那么你应该希望你的应用可以在 Google 或其他搜索引擎有一个好的排名。因为很多网络爬虫不支持客户端呈现(如果支持的话可能 websockets 也会参差不齐)，所以最好是在服务器上呈现网站然后将其作为 HTML 发送。
 
 To do so, we can use the [Prerender.io](https://prerender.io) service, thanks to the [`dfischer:prerenderio`](https://atmospherejs.com/dfischer/prerenderio) package. It's a simple as `meteor add`-ing it, and optionally setting your prerender token if you have a premium prerender account and would like to enable more frequent cache changes.
 
