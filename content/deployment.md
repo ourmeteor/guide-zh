@@ -299,8 +299,8 @@ Meteor 的主要性能特点是通过 livequery 行为实现的，livequery 允�
 
 如果你的应用包含了很多可以公开访问的内容，那么你应该希望你的应用可以在 Google 或其他搜索引擎有一个好的排名。因为很多网络爬虫不支持客户端呈现(如果支持的话可能 websockets 也会参差不齐)，所以最好是在服务器上呈现网站然后将其作为 HTML 发送。
 
-To do so, we can use the [Prerender.io](https://prerender.io) service, thanks to the [`dfischer:prerenderio`](https://atmospherejs.com/dfischer/prerenderio) package. It's a simple as `meteor add`-ing it, and optionally setting your prerender token if you have a premium prerender account and would like to enable more frequent cache changes.
+我们可以使用[Prerender.io](https://prerender.io)，名字为[`dfischer:prerenderio`](https://atmospherejs.com/dfischer/prerenderio)的包来实现这种目的。使用 `meteor add` 命令即可添加，如果你有额外的预渲染账号并希望进行频繁的缓存更改，可以自由设置你的预渲染口令。
 
-If you’re using [Galaxy to host your meteor apps](https://www.meteor.com/galaxy/signup), you can also take advantage of built-in automatic [Prerender.io](https://prerender.io) integration. Simply add [`mdg:seo`](https://atmospherejs.com/mdg/seo) to your app and Galaxy will take care of the rest.
+如果你正在使用 [Galaxy 托管你的应用](https://www.meteor.com/galaxy/signup)，你还可以使用内置的自动[Prerender.io](https://prerender.io)集成。只需要在应用中简单添加 [`mdg:seo`](https://atmospherejs.com/mdg/seo)，Galaxy 就会知道怎么做了。
 
-Chances are you also want to set `<title>` tags and other `<head>` content to make your site appear nicer in search results. The best way to do so is to use the [`kadira:dochead`](https://atmospherejs.com/kadira/dochead) package. The sensible place to call out to `DocHead` is from the `onCreated` callbacks of your page-level components.
+你还有可能需要添加 `<title>` 标签和其他 `<head>` 内容来实现搜索引擎优化。最好的方法是使用[`kadira:dochead`](https://atmospherejs.com/kadira/dochead)包。调用 `DocHead` 的最佳地方是页面级组件中的 `onCreated` 回调。
