@@ -17,39 +17,39 @@ discourseTopicId: 19664
 
 <h2 id="core-meteor">Meteor 核心特点</h2>
 
-Before we get into all of the different user-facing accounts functionality you can add with Meteor, let's go over some of the features built into the Meteor DDP protocol and `accounts-base` package. These are the parts of Meteor that you'll definitely need to be aware of if you have any user accounts in your app; most of everything else is optional and added/removed via packages.
+在外面了解 Meteor 面向用户的账户功能之前，我们先来了解一下 Meteor DDP 协议内置功能和  `accounts-base` 包。如果你的 Meteor 应用中有用户账号，这就是你应该关注的，大部分都是通过添加/删除包就行操作的。
 
-<h3 id="userid-ddp">userId in DDP</h3>
+<h3 id="userid-ddp">DDP 中的 userId</h3>
 
-DDP is Meteor's built-in pub/sub and RPC protocol. You can read about how to use it in the [Data Loading](data-loading.html) and [Methods](methods.html) articles. In addition to the concepts of data loading and method calls, DDP has one more feature built in - the idea of a `userId` field on a connection. This is the place where login state is tracked, regardless of which accounts UI package or login service you are using.
+DDP 是 Meteor 的内置 pub/sub 和 RPC 协议。你可以从 [数据加载](data-loading.html) 和 [Methods](methods.html)中学习这方面的知识。除了 数据加载和 Method 的概念，DDP 还有一项内置功能——`userId`属性。`userId` 跟踪登录状态，而使用的用户 UI 包和登录服务无关。
 
-This built-in feature means that you always get `this.userId` inside Methods and Publications, and can access the user ID on the client. This is a great starting point for building your own custom accounts system, but most developers won't need to worry about the mechanics, since you'll mostly be interacting with the `accounts-base` package instead.
+这项内置功能意味着在 Methods 和 Publications 中我们总是可以获取 `this.userId`，在客户端也可以获取用户 ID. 了解这一点对于建立自定义的用户系统非常重要，大多数开发者并不需要担心机制问题，因为大部分时间是在跟 `accounts-base` 实现交互。
 
 <h3 id="accounts-base">`accounts-base`</h3>
 
-This package is the core of Meteor's developer-facing user accounts functionality. This includes:
+T这个包是 Meteor 面向开发者的用户账号功能的核心，包含：
 
-1. A users collection with a standard schema, accessed through [`Meteor.users`](http://docs.meteor.com/#/full/meteor_users), and the client-side singletons [`Meteor.userId()`](http://docs.meteor.com/#/full/meteor_userid) and [`Meteor.user()`](http://docs.meteor.com/#/full/meteor_user), which represent the login state on the client.
-2. A variety of helpful other generic methods to keep track of login state, log out, validate users, etc. Visit the [Accounts section of the docs](http://docs.meteor.com/#/full/accounts_api) to find a complete list.
-3. An API for registering new login handlers, which is used by all of the other accounts packages to integrate with the accounts system. There isn't any official documentation for this API, but you can [read more about it on the MeteorHacks blog](https://meteorhacks.com/extending-meteor-accounts).
+1. 有着标准架构的用户集，用户集通过 [`Meteor.users`](http://docs.meteor.com/#/full/meteor_users) 获取，[`Meteor.userId()`](http://docs.meteor.com/#/full/meteor_userid) 和 [`Meteor.user()`](http://docs.meteor.com/#/full/meteor_user) 代表客户端的用户的登录状态。
+2. 有很多有用且通用的 Methods 可以跟踪登录状态，退出登录状态，用户验证等，访问 [Accounts section of the docs](http://docs.meteor.com/#/full/accounts_api) 获取完整列表。
+3. .一个用于注册新登录处理器的 API 接口，用于集成其他账户包和账户系统，关于这个 API 接口没有正式的文件说明，可以通过[访问 MeteorHacks blog](https://meteorhacks.com/extending-meteor-accounts)获取更多信息。
 
-Usually, you don't need to include `accounts-base` yourself since it's added for you if you use `accounts-password` or similar, but it's good to be aware of what is what.
+通常情况下不需要添加 `accounts-base` 因为当添加类似 `accounts-password` 的包时就已经顺便添加了。但你应该知道有这回事。
 
-<h2 id="accounts-ui">Fast prototyping with `accounts-ui`</h2>
+<h2 id="accounts-ui">使用 `accounts-ui` 快速构建原型</h2>
 
-Often, a complicated accounts system is not the first thing you want to build when you're starting out with a new app, so it's useful to have something you can just drop in quickly. This is where `accounts-ui` comes in - it's just one line that you drop into your app to get an accounts system. To add it:
+通常情况下，开始设计应用的第一件事并不是构建一个相当复杂的用户系统，所以我们需要知道有哪些方法可以快速上手。这就是我们为什么要介绍 `accounts-ui`——只需要在你的应用中加一行代码，就可以建立一个用户系统。
 
 ```js
 meteor add accounts-ui
 ```
 
-Then just include it anywhere in a Blaze template:
+包含于 Blaze 模板中：
 
 ```html
 {{> loginButtons}}
 ```
 
-Then, make sure to pick a login provider; they will automatically integrate with `accounts-ui`:
+然后选择一个登录提供商；它们会自动集成 `accounts-ui`：
 
 ```sh
 # pick one or more of the below
@@ -62,17 +62,17 @@ meteor add accounts-meetup
 meteor add accounts-meteor-developer
 ```
 
-Now just open your app, follow the configuration steps, and you're good to go - if you've done the [Meteor tutorial](https://www.meteor.com/tutorials/blaze/adding-user-accounts), you've already seen this in action. Of course, in a production application, you probably want a more custom user interface and some logic to have a more tailored UX, but that's why we have the rest of this guide.
+现在只需要打开应用，跟着配置流程走，就 OK 了——如果你完成了 [Meteor tutorial](https://www.meteor.com/tutorials/blaze/adding-user-accounts), 那你应该记得这一步。当然，在生产应用中，我们可能会需要定制化的用户界面和用户体验，你可以在接下来的教程中学到这些东西。
 
-Here are a couple of screenshots of `accounts-ui` so you know what to expect:
+这是几张 `accounts-ui` 截图可以帮助理解：
 
 <img src="images/accounts-ui.png">
 
 <h2 id="useraccounts">Customizable UI: useraccounts</h2>
 
-Once you've gotten your initial prototype up and running with `accounts-ui`, you'll want to move to something more powerful and configurable so that you can better integrate your login flow with the rest of your app. The [`useraccounts` family of packages](http://useraccounts.meteor.com/) is the most powerful set of accounts management UI controls available for Meteor today. If you need even more customization, you can also roll your own system, but it's worth trying `useraccounts` first.
+一旦建立了运行 `accounts-ui` 的应用原型，你就会想要实现更强大和更配置化的功能，这样就可以更好地把登录流程整合到应用中。[`useraccounts` 家庭包](http://useraccounts.meteor.com/)是 Meteor 最强大的一组账户管理 UI 控制包。
 
-<h3 id="useraccounts-flexibility">Use any router or UI framework</h3>
+<h3 id="useraccounts-flexibility">使用任何路由或 UI 框架</h3>
 
 The first thing to understand about `useraccounts` is that the core accounts management logic is independent of the HTML templates and routing packages. This means you can use [`useraccounts:core`](https://atmospherejs.com/useraccounts/core) to build your own set of login templates. Generally, you'll want to pick one login template package and one login routing package. The options for templates include:
 
