@@ -74,33 +74,33 @@ meteor add accounts-meteor-developer
 
 <h3 id="useraccounts-flexibility">使用任何路由或 UI 框架</h3>
 
-The first thing to understand about `useraccounts` is that the core accounts management logic is independent of the HTML templates and routing packages. This means you can use [`useraccounts:core`](https://atmospherejs.com/useraccounts/core) to build your own set of login templates. Generally, you'll want to pick one login template package and one login routing package. The options for templates include:
+了解 `useraccounts` 的第一步就是认识到核心账户管理逻辑跟 HTML 模板和路由包是相互独立的。这意味着你可以使用 [`useraccounts:core`](https://atmospherejs.com/useraccounts/core) 自定义登录模板。通常来说，你会需要一个登录模板包和一个登录路由包。可供选择的模板：
 
-- [`useraccounts:unstyled`](https://atmospherejs.com/useraccounts/unstyled) which lets you bring your own CSS; this one is used in the Todos example app to make the login UI blend seamlessly with the rest of the app.
-- Pre-built templates for [Bootstrap, Semantic UI, Materialize, and more](http://useraccounts.meteor.com/). These templates don't come with the actual CSS framework, so you can pick your favorite Bootstrap package, for example.
+—— [`useraccounts:unstyled`](https://atmospherejs.com/useraccounts/unstyled)可以自定义 CSS;我们在 Todos 应用中使用这个包将登录 UI 无缝融合到应用中。
+—— [Bootstrap, Semantic UI, Materialize, and more](http://useraccounts.meteor.com/)预建立的模板。这些模板不自带 CSS 框架，所以可以选择自己喜欢的 Bootstrap 包。
 
-While it's optional and the basic functionality will work without it, it's also a good idea to pick a router integration:
+虽然基础的应用可能不需要路由也一样可以工作，但是在应用中集成路由是一种好习惯：
 
-- [Flow Router](https://atmospherejs.com/useraccounts/flow-routing), the router [recommended in this guide](routing.html).
-- [Iron Router](https://atmospherejs.com/useraccounts/iron-routing), another popular router in the Meteor community.
+- [Flow Router](https://atmospherejs.com/useraccounts/flow-routing), [本教程中推荐的](routing.html)路由。
+- [Iron Router](https://atmospherejs.com/useraccounts/iron-routing), Meteor 社区中另外一个很受欢迎的路由。
 
-In the example app we are using the Flow Router integration with great success. Some of the later sections will cover how to customize the routes and templates to fit your app better.
+在 Todos 应用中我们成功使用  Flow Router. 接下来的一些章节将介绍如何自定义路线和模板，以更好地满足您的应用程序。
 
-<h3 id="useraccounts-drop-in">Drop-in UI without routing</h3>
+<h3 id="useraccounts-drop-in">不带路由的插入式 UI</h3>
 
-If you don't want to configure routing for your login flow, you can just drop in a self-managing accounts screen. Wherever you want the accounts UI template to render, just include the `atForm` template, like so:
+如果你不想为登录流程配置路由，可以使用自我管理账户界面。当想要呈现账户 UI 模板时，只需要引入 `atForm` 模板即可，就像这样：
 
 ```html
 {{> atForm}}
 ```
 
-Once you configure routing according to [the section below](#useraccounts-customizing-routes), you'll want to remove this inclusion.
+如果你根据[下面的章节](#useraccounts-customizing-routes)配置路由，就可以移除上面的 `atForm` 模板。
 
-<h3 id="useraccounts-customizing-templates">Customizing templates</h3>
+<h3 id="useraccounts-customizing-templates">自定义模板</h3>
 
-For some apps, the off-the-shelf login templates provided by the various `useraccounts` UI packages will work as-is, but most apps will want to customize some of the presentation. There's a simple way to do that using the template replacement functionality of the `aldeed:template-extension` package.
+对于一些应用来说，`useraccounts` UI 包提供的登录界面就已经足够用了，但对于大多数应用来说，自定义是必须滴。有一个简单的办法就是使用 `aldeed:template-extension` 包来实现替换模板的功能。
 
-First, figure out which template you want to replace by looking at the source code of the package. For example, in the `useraccounts:unstyled` package, the templates are listed [in this directory on GitHub](https://github.com/meteor-useraccounts/unstyled/tree/master/lib). By squinting at the file names and looking for some of the HTML strings, we can figure out that we might be interested in replacing the `atPwdFormBtn` template. Let's take a look at the original template:
+首先，通过查看包的源代码找出你想要替换的模板。例如，`useraccounts:unstyled` 包含的模板[在 GitHub 目录中](https://github.com/meteor-useraccounts/unstyled/tree/master/lib). 通过查找文件名和 HTML 字符串，我们可以按照自定义的目标替换 `atPwdFormBtn` 模板。我们先来看一下原始模板：
 
 ```html
 <template name="atPwdFormBtn">
@@ -110,12 +110,12 @@ First, figure out which template you want to replace by looking at the source co
 </template>
 ```
 
-Once you've identified which template you need to replace, define a new template. In this case, we want to modify the class on the button to work with the CSS for the rest of the app. There are a few things to keep in mind when overriding a template:
+Once you've identified which template you need to replace, define a new template. In this case, we want to modify the class on the button to work with the CSS for the rest of the app. There are a few things to keep in mind when overriding a template:一旦确定了要替换哪个模板，就需要自定义一个新的模板。在这个例子中，我们要修改按钮的类定义的 CSS, 在覆盖原模板的时候需要注意以下几点：
 
-1. Render the helpers in the same way the previous template did. In this case we are using `buttonText`.
-2. Keep any `id` attributes, like `at-btn`, since those are used for event handling.
+1. 以前模板中 render helpers 的方式保持不变， 在这个例子中我们使用 `buttonText`.
+2. 保留任何 `id` 属性，如 `at-btn`, 因为这些属性在事件处理中有用到。
 
-Here's what our new override template looks like:
+我们新的覆盖模板长这样：
 
 ```html
 <template name="override-atPwdFormBtn">
@@ -125,17 +125,17 @@ Here's what our new override template looks like:
 </template>
 ```
 
-Then, use the `replaces` function on the template to override the existing template from `useraccounts`:
+然后，在模板之间通过 `replaces` 函数替换 `useraccounts` 中存在的模板：
 
 ```js
 Template['override-atPwdFormBtn'].replaces('atPwdFormBtn');
 ```
 
-<h3 id="useraccounts-customizing-routes">Customizing routes</h3>
+<h3 id="useraccounts-customizing-routes">自定义路径</h3>
 
-In addition to having control over the templates, you'll want to be able to control the routing and URLs for the different views offered by `useraccounts`. Since Flow Router is the officially recommended routing option for Meteor, we'll go over that in particular.
+除了可以控制模板，你还可以通过控制路由和 URLs访问 `useraccounts` 的不同界面。因为  Flow Router 是 Meteor 官方推荐的，所以在这个例子中我们也会使用  Flow Router.
 
-First, we need to configure the layout we want to use when rendering the accounts templates:
+首先，我们需要确定渲染账户模板时所配置的布局：
 
 ```js
 AccountsTemplates.configure({
@@ -146,7 +146,7 @@ AccountsTemplates.configure({
 });
 ```
 
-In this case, we want to use the `App_body` layout template for all of the accounts-related pages. This template has a content region called `main`. Now, let's configure some routes:
+在这个例子中，我们想要在所有的账户相关页面中使用 `App_body` 布局模板。这个模板有一个命名为 `main` 的内容区域。现在我们来配置一些路径：
 
 ```js
 // Define these routes in a file loaded on both client and server
@@ -168,7 +168,7 @@ AccountsTemplates.configureRoute('resetPwd', {
 });
 ```
 
-Now, we can easily render links to our login page like so:
+现在我们可以很轻松地将页面链接到我们的登录界面：
 
 ```html
 <div class="btns-group">
@@ -177,15 +177,15 @@ Now, we can easily render links to our login page like so:
 </div>
 ```
 
-Note that we have specified a password reset route. Normally, we would have to configure Meteor's accounts system to send this route in password reset emails, but the `useraccounts:flow-routing` package does it for us. [Read more about configuring email flows below.](#email-flows)
+注意到我们已经指定了密码重设路径。通常来说，我们需要配置 Meteor 的账户系统，在密码重置邮件中发送该路径，但是 `useraccounts:flow-routing` 已经帮我们做了这项工作。[关于如何配置电子邮件我们将在下文提到](#email-flows).
 
-You can find a complete list of different available routes in the [documentation the `useraccounts:flow-routing`](https://github.com/meteor-useraccounts/flow-routing#routes).
+你可以在[`useraccounts:flow-routing` 文档](https://github.com/meteor-useraccounts/flow-routing#routes)获取一个完整的可使用路径列表。
 
-<h3 id="useraccounts-further-customization">Further customization</h3>
+<h3 id="useraccounts-further-customization">更高级的定制化</h3>
 
-`useraccounts` offers many other customization options beyond templates and routing. Read the [`useraccounts` guide](https://github.com/meteor-useraccounts/core/blob/master/Guide.md) to learn about all of the other options.
+`useraccounts` 还提供除模板和路由之外的其他定制功能。阅读[`useraccounts` 教程](https://github.com/meteor-useraccounts/core/blob/master/Guide.md)了解更多的功能。
 
-<h2 id="accounts-password">Password login</h2>
+<h2 id="accounts-password">密码登录</h2>
 
 Meteor comes with a secure and fully-featured password login system out of the box. To use it, add the package:
 
