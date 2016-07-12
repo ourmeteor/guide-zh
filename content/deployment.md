@@ -16,11 +16,11 @@ discourseTopicId: 19668
 
 <h2 id="deploying">部署 Meteor 应用</h2>
 
-你建立了一个 Meteor 应用，并且通过了测试，现在是时候把它放到网上让全世界人民欣赏了。部署一个 Meteor 应用跟部署其他 websocket-based Node.js 应用类似，但在某些方面存在不同。
+你建立了一个 Meteor 应用，并且通过了测试，现在是时候把它放到网上让全世界人民欣赏了。部署一个 Meteor 应用跟部署其他基于 WebScoket 的 Node.js 应用类似，但在某些方面存在不同。
 
-部署一个应用跟大部分的发行软件有本质上的区别，我们可以多次部署。不需要等待用户换取软件的新版本，因为服务器会把更新的信息推送给用户。
+部署一个 web 应用跟大部分的发行软件有本质上的区别，我们可以多次部署。不需要等待用户换取软件的新版本，因为服务器会把更新的信息推送给用户。
 
-使用优秀的质量保证(QA)流程对更改进行测试仍然是非常重要的。即使修复 bugs 很容易，这些错误仍然可能给客户造成严重困扰，并可能导致数据丢失！
+使用优秀的质量保证 (QA) 流程对更改进行测试仍然是非常重要的。即使修复 bugs 很容易，这些错误仍然可能给客户造成严重困扰，并可能导致数据丢失！
 
 <h3 id="environments">部署环境</h3>
 
@@ -28,11 +28,11 @@ discourseTopicId: 19668
 
 1. **Development.** 开发环境，这是指你开发新功能和运行本地测试的机器。
 2. **Staging.** 中间环境，类似于 Production，但对应用的用户不可见。可以用于测试和 QA.
-3. **Production.** 生产环节，用户使用中的 app 的真实部署环境。
+3. **Production.** 生产环境，用户使用中的 app 的真实部署环境。
 
-中间环境主要是为了提供一个用户不可见的测试环境，在框架上跟真实部署环境无限接近。新代码在开发环境中不会出现问题，但到了真实生产环节中就出问题了。以客户端和服务器端之间的延迟问题为例 —— 连接到本地开发服务器，这么小的延迟你可能都不会将它当作一个问题。
+中间环境主要是为了提供一个用户不可见的测试环境，在框架上跟真实部署环境无限接近。新代码在开发环境中不会出现问题，但到了真实生产环境中就出问题了。以客户端和服务器端之间的延迟问题为例 —— 连接到本地开发服务器，这么小的延迟你可能都不会将它当作一个问题。
 
-因为这个原因，开发者会尽量让中间环节接近实际的生产环节。这意味着我们下面提到的在生产环节部署的步骤，也非常适用于中间环境。
+因为这个原因，开发者会尽量让中间环境接近实际的生产环境。这意味着我们下面提到的在生产环境部署的步骤，也非常适用于中间环境。
 
 <h3 id="environment">环境变量和设置</h3>
 
@@ -41,11 +41,11 @@ discourseTopicId: 19668
 1. **Environment variables.** 环境变量，这是运行过程中需要设置的一系列 `ENV_VARS`.
 2. **Settings.** 设置，位于 JSON 对象中，通过 Meteor 命令 `--settings` 设置或字符串化到 `METEOR_SETTINGS` 环境变量。
 
-设置用于设置环境(中间环境或生产环境)中具体事项，例如用于连接谷歌的访问标志和密钥。在特定环境中运行应用时这些设置不会改变
+设置用于设置环境 (中间环境或生产环境) 中具体事项，例如用于连接谷歌的访问标志和密钥。在特定环境中运行应用时这些设置不会改变
 
 环境变量用于设置应用进程事项，可以根据应用的不同实例进行改变。例如，你可以为各个进程设置不同的 `KADIRA_OPTIONS_HOSTNAME` 来确保 [kadira](#kadira) 日志记录有用的主机名。
 
-在存储这些设置上还有一点需要说明：不要把这些设置文件跟你的应用代码存放在同一个栈。阅读相关文章了解这些设置最好存放在什么地方 [安全性章节](security.html#api-keys).
+在存储这些设置上还有一点需要说明：不要把这些设置文件跟你的应用代码存放在同一个栈。阅读[安全性章节](security.html#api-keys)了解这些设置最好存放在什么地方。
 
 <h2 id="other-considerations">其他考虑</h2>
 
@@ -53,19 +53,19 @@ discourseTopicId: 19668
 
 <h3 id="domain-name">域名</h3>
 
-用户通过什么 URL 访问你的网站？你可能需要向域名注册商注册一个域名，并设置 DNS 指向特定网站(这要看你如何部署，请看下文)。如果你在 Galaxy 部署，在测试应用的时候可以使用 `x.meteorapp.com` 域名。
+用户通过什么 URL 访问你的网站？你可能需要向域名注册商注册一个域名，并设置 DNS 指向特定网站 (这要看你如何部署，请看下文)。如果你在 Galaxy 部署，在测试应用的时候可以使用 `x.meteorapp.com` 域名。
 
 <h3 id="ssl">SSL 认证</h3>
 
-在 Meteor 应用中使用 SSL 总是一件好事(要了解为什么请阅读[安全性章节](security.html#ssl))。一旦你注册了一个域名，就会需要根据域名证书颁发机构生成一个 SSL 证书。
+在 Meteor 应用中使用 SSL 总是一件好事 (要了解为什么请阅读[安全性章节](security.html#ssl))。一旦你注册了一个域名，就会需要根据域名证书颁发机构生成一个 SSL 证书。
 
 <h3 id="cdn">CDN</h3>
 
-虽然不是严格要求，但为你的网站建立内容分布网络(CDN)会是一个好主意。CDN 是托管网站静态资产(如 JavaScript, CSS, 和 images)的服务器网络，它分布在世界上各个地方，并使用最靠近用户的服务器为用户提供这些静态资产，目的是加速访问速度。例如，如果网站的服务器在 USA 的东海岸，而你的用户在澳大利亚，CDN 可以在澳大利亚，甚至在用户所在的城市托管一份该网站 JavaScript 的副本。这将极大缩短网站的初始加载时间。
+虽然不是严格要求，但为你的网站建立内容分布网络 (CDN) 会是一个好主意。CDN 是托管网站静态资产 (如 JavaScript, CSS, 和 images) 的服务器网络，它分布在世界上各个地方，并使用最靠近用户的服务器为用户提供这些静态资产，目的是加速访问速度。例如，如果网站的服务器在 USA 的东海岸，而你的用户在澳大利亚，CDN 可以在澳大利亚，甚至在用户所在的城市托管一份该网站 JavaScript 的副本。这将极大缩短网站的初始加载时间。
 
 CDN 最基本的语法就是把文件上传到 CDN 并改变 URL 指向 CDN (例如你的 Meteor 应用位于 `http://myapp.com`，则将图片的 URL 从 `<img src="http://myapp.com/cats.gif">` 改为 `<img src="http://mycdn.com/cats.gif">`). 但是这对于 Meteor 来说有点困难，因为最大的文件夹 —— Javascript 组件会因为你更改应用而经常改变。
 
-对于 Meteor 来讲，我们推荐使用内部支持的 CDN (例如 [CloudFront](http://joshowens.me/using-a-cdn-with-your-production-meteor-app/))，跟提前上传文件相比，CDN 自动从你的服务器获取文件。你把文件放在 `public/` 文件夹(在这个例子中是 `public/cats.gif`)，这样当澳大利亚的用户通过 CDN 访问 `http://mycdn.com/cats.gif` 时，CDN 会访问 `http://myapp.com/cats.gif` 获取文件然后发送给用户。虽然这比直接访问 `http://myapp.com/cats.gif` 获取文件会慢一点，但这只会发生一次，因为 CDN 会保存这些文件，接下来澳大利亚用户访问都可以快速获取文件。
+对于 Meteor 来讲，我们推荐使用内部支持的 CDN (例如 [CloudFront](http://joshowens.me/using-a-cdn-with-your-production-meteor-app/))，跟提前上传文件相比，CDN 自动从你的服务器获取文件。你把文件放在 `public/` 文件夹 (在这个例子中是 `public/cats.gif`)，这样当澳大利亚的用户通过 CDN 访问 `http://mycdn.com/cats.gif` 时，CDN 会访问 `http://myapp.com/cats.gif` 获取文件然后发送给用户。虽然这比直接访问 `http://myapp.com/cats.gif` 获取文件会慢一点，但这只会发生一次，因为 CDN 会保存这些文件，接下来澳大利亚用户访问都可以快速获取文件。
 
 让 Meteor 使用 CDN 存储 Javascript 和 CSS 文件需要在服务器调用 `WebAppInternals.setBundledJsCssPrefix("http://mycdn.com")`。这也会包含 CSS 文件中包含的图片 URL。如果你需要使用动态前缀，可以从一个函数返回前缀并传递给 `WebAppInternals.setBundledJsCssUrlRewriteHook()`.
 
@@ -91,7 +91,7 @@ Template.registerHelper("assetUrl", (asset) => {
 
 <h4 id="cdn-webfonts">CDNs 和 webfonts</h4>
 
-如果你的应用中包含网络字体并通过CDN获取，您可能需要配置字体的 header，以允许跨域资源共享(因为网络字体来自于你的网站之外的其他地方)。在 Meteor 可以通过添加一个 handler 轻松做到(你必须确保 CDN 遍历 header):
+如果你的应用中包含网络字体并通过CDN获取，您可能需要配置字体的 header，以允许跨域资源共享 (因为网络字体来自于你的网站之外的其他地方)。在 Meteor 可以通过添加一个 handler 轻松做到 (你必须确保 CDN 遍历 header):
 
 ```js
 import { WebApp } from 'meteor/webapp';
@@ -106,13 +106,13 @@ WebApp.rawConnectHandlers.use(function(req, res, next) {
 
 以 Cloudfront 为例，你将能够：
 
-- Select your distribution
-- Behavior tab
-- Select your app origin
-- Edit button
-- Under "Whitelist Headers", scroll down to select "Origin"
-- Add button
-- "Yes, Edit" button
+- 选择分布
+- Behavior 选项
+- 选择应用原型
+- 编辑按钮
+- 在 "Whitelist Headers" 下拉选择 "Origin"
+- 添加按钮
+- "Yes, Edit"按钮
 
 <h2 id="deployment-options">部署选项</h2>
 
@@ -124,7 +124,7 @@ Meteor 是一个开源平台，跟 regular Node.js 应用一样，你可以在�
 
 Galaxy 是在 Amazon AWS 上运行的分布式系统。如果你了解 Galaxy 是如何工作以及如何正确运行 Meteor 应用的，你一定会体会到 Galaxy 的价值，Galaxy 可以节约大量的时间和避免不必要的麻烦。目前很多大型 Meteor 应用都是在 Galaxy 上运行，其中很多都是从定制化的部署方案转换到 Galaxy.
 
-如果要在 Galaxy 上部署，需要[注册一个账号](https://www.meteor.com/galaxy/signup),并分开提供 MongoDB 数据库(参考下文)。
+如果要在 Galaxy 上部署，需要[注册一个账号](https://www.meteor.com/galaxy/signup),并分开提供 MongoDB 数据库 (参考下文)。
 
 注册好账号后，[部署到 Galaxy](http://galaxy-guide.meteor.com/deploy-guide.html)就很简单了。只需要[在设置文件中添加环境变量](http://galaxy-guide.meteor.com/environment-variables.html)指向你的 MongoDB, 然后就可以根据下面的命令部署了：
 
@@ -132,7 +132,7 @@ Galaxy 是在 Amazon AWS 上运行的分布式系统。如果你了解 Galaxy �
 DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy your-app.com --settings production-settings.json
 ```
 
-为了让 你的域名(在这个例子中是 `your-app.com`)在 Galaxy 也可以工作，你需要[设置 DNS 指向 Galaxy](http://galaxy-guide.meteor.com/dns.html)。完成之后，就应该可以通过浏览器访问你的网站。
+为了让 你的域名 (在这个例子中是 `your-app.com`) 在 Galaxy 也可以工作，你需要[设置 DNS 指向 Galaxy](http://galaxy-guide.meteor.com/dns.html)。完成之后，就应该可以通过浏览器访问你的网站。
 
 你也可以通过 https://galaxy.meteor.com 进入 Galaxy UI,在 Galaxy UI 可以管理你的应用，监控连接数和资源使用，查看日志，更改设置。
 
@@ -140,13 +140,13 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy your-app.com --
 
 如果你根据[我们的建议](security.html#ssl)，你可能会想要在 Galaxy 应用上通过域名的证书和密钥[设置 SSL](http://galaxy-guide.meteor.com/encryption.html)。这里的关键点是添加 `force-ssl` 包，并通过 Galaxy UI 添加 SSL 证书。
 
-一旦设置好 Galaxy, 部署就很简单了(重新运行上面的 `meteor deploy` 命令)，监控就更简单了 —— 登入 galaxy.meteor.com, 在那里就可以监控。
+一旦设置好 Galaxy, 部署就很简单了 (重新运行上面的 `meteor deploy` 命令)，监控就更简单了 —— 登入 galaxy.meteor.com, 在那里就可以监控。
 
 <img src="images/galaxy-scaling.png">
 
 <h4 id="galaxy-mongo">一起使用的 MongoDB 托管环境</h4>
 
-如果你正在使用 Galaxy(或者使用下面提到的服务，并需要管理 MongoDB),建议使用[MongoDB 托管服务](http://galaxy-guide.meteor.com/mongodb.html)。可以有很多种选择，但我们推荐[mLab](https://mlab.com/)。需要支持 oplog tailing，并且存在于 AWS 的 us-east-1 或 eu-west-1 区域。
+如果你正在使用 Galaxy (或者使用下面提到的服务，并需要管理 MongoDB),建议使用[MongoDB 托管服务](http://galaxy-guide.meteor.com/mongodb.html)。可以有很多种选择，但我们推荐[mLab](https://mlab.com/)。需要支持 oplog tailing，并且存在于 AWS 的 us-east-1 或 eu-west-1 区域。
 
 <h3 id="mup">Meteor Up</h3>
 
@@ -192,11 +192,11 @@ MONGO_URL=mongodb://localhost:27017/myapp ROOT_URL=http://my-app.com node main.j
 
 <h3 id="continuous-deployment">持续性部署</h3>
 
-持续性部署是指在一定条件下，使用持续集成工具部署应用的过程(就像使用 git push 命令推送到 `master` 分支)。你可以使用 CD 命令部署到 Galaxy,[博客文章的主题](https://medium.com/@natestrauser/migrating-meteor-apps-from-modulus-to-galaxy-with-continuous-deployment-from-codeship-aed2044cabd9#.lvio4sh4a).
+持续性部署是指在一定条件下，使用持续集成工具部署应用的过程 (就像使用 git push 命令推送到 `master` 分支)。你可以使用 CD 命令部署到 Galaxy,阅读[博客文章的主题](https://medium.com/@natestrauser/migrating-meteor-apps-from-modulus-to-galaxy-with-continuous-deployment-from-codeship-aed2044cabd9#.lvio4sh4a)了解更多。
 
 <h3 id="rolling-updates-and-data">滚动部署和数据版本</h3>
 
-理解部署中发生了什么事是很重要的，特别是当部署涉及到数据格式改变(和潜在的数据迁移，查看[集合章节](collections.html#migrations))。
+理解部署中发生了什么事是很重要的，特别是当部署涉及到数据格式改变 (和潜在的数据迁移，查看[集合章节](collections.html#migrations))。
 
 当在多个服务器或容器上运行你的应用，最好不要一次性关闭所有服务器然后再重新打开备份。这样做停机时间会更长，而且当所有用户再次同时连接时会导致 CPU 使用率急剧上升。为了缓和这种情况，Galaxy 在部署的时候会将一个容器停止和重启，然后进行下一个容器的停止和重启。会有一段时间一些容器在旧版本上运行，一些容器在新版本上运行，用户逐渐从旧版本切换到新版本。
 
@@ -211,7 +211,7 @@ MONGO_URL=mongodb://localhost:27017/myapp ROOT_URL=http://my-app.com node main.j
 ```
 meteor add okgrow:analytics
 ```
-现在我们需要使用 Google Analytics key 配置包(该包除了支持 Google Analytics, 也支持其他类似工具，查看[Atmosphere 文档](https://atmospherejs.com/okgrow/analytics)). 作为 [_Meteor settings_](#environment) 的一部分进行传递：
+现在我们需要使用 Google Analytics key 配置包 (该包除了支持 Google Analytics, 也支持其他类似工具，查看[Atmosphere 文档](https://atmospherejs.com/okgrow/analytics)). 作为 [_Meteor settings_](#environment) 的一部分进行传递：
 
 ```js
 {
@@ -256,7 +256,7 @@ export const updateText = new ValidatedMethod({
 
 <h3 id="galaxy-apm">使用 Galaxy 监控</h3>
 
-[Galaxy](#galaxy) 提供 turnkey Meteor 托管和其他一些非常有用的工具用于 debug. 如果你的设置是用于处理当前负载(或者你需要更多容器)，决定设置的关键将是 CPU，内存负载图和连接用户数，或者一些不相称的用户过载行为(看起来不相关)：
+[Galaxy](#galaxy) 提供 turnkey Meteor 托管和其他一些非常有用的工具用于 debug. 如果你的设置是用于处理当前负载(或者你需要更多容器)，决定设置的关键将是 CPU，内存负载图和连接用户数，或者一些不相称的用户过载行为 (看起来不相关)：
 
 <img src="images/galaxy-metrics.png">
 
@@ -266,7 +266,7 @@ Galaxy's UI提供了详细的登录系统，这在决定哪种行为造成了过
 
 <h3 id="kadira">Kadira</h3>
 
-如果你真的想知道运行 Meteor 应用的来龙去脉，可以尝试[Kadira](https://kadira.io)。Kadira 是专为 Meteor 建造的全功能应用性能监控(APM)解决方案。Kadira 在应用运行时会监控和观察客户端和服务器端，然后把发生的行为发送给主服务器。
+如果你真的想知道运行 Meteor 应用的来龙去脉，可以尝试[Kadira](https://kadira.io)。Kadira 是专为 Meteor 建造的全功能应用性能监控 (APM)  解决方案。Kadira 在应用运行时会监控和观察客户端和服务器端，然后把发生的行为发送给主服务器。
 
 当访问 Kadira 应用时，可以从多个指标观察你的应用过去和现在的行为。Kadira's [文档](https://kadira.io/platform/kadira-apm/overview)非常全面非常有价值，我们在这里只讨论几点。
 
@@ -282,7 +282,7 @@ Galaxy's UI提供了详细的登录系统，这在决定哪种行为造成了过
 
 <img src="images/kadira-method-trace.png">
 
-在上面的截图中我们看到一个很慢的 method 调用(用了214ms)，我们深入研究，发现大部分时间用于等待用户连接行为(主要是 `searches/top` 和 `counts` publications)。所有我们会考虑加速 subscriptions 的初始化时间，因为在某些情况下它会使搜索变慢。
+在上面的截图中我们看到一个很慢的 method 调用 (用了214ms)，我们深入研究，发现大部分时间用于等待用户连接行为 (主要是 `searches/top` 和 `counts` publications)。所有我们会考虑加速 subscriptions 的初始化时间，因为在某些情况下它会使搜索变慢。
 
 
 <h4 id="kadira-livequery">现场查询监控</h4>
@@ -297,7 +297,7 @@ Meteor 的主要性能特点是通过 livequery 行为实现的，livequery 允�
 
 <h2 id="seo">SEO</h2>
 
-如果你的应用包含了很多可以公开访问的内容，那么你应该希望你的应用可以在 Google 或其他搜索引擎有一个好的排名。因为很多网络爬虫不支持客户端呈现(如果支持的话可能 websockets 也会参差不齐)，所以最好是在服务器上呈现网站然后将其作为 HTML 发送。
+如果你的应用包含了很多可以公开访问的内容，那么你应该希望你的应用可以在 Google 或其他搜索引擎有一个好的排名。因为很多网络爬虫不支持客户端呈现  (如果支持的话可能 websockets 也会参差不齐)，所以最好是在服务器上呈现网站然后将其作为 HTML 发送。
 
 我们可以使用[Prerender.io](https://prerender.io)，名字为[`dfischer:prerenderio`](https://atmospherejs.com/dfischer/prerenderio)的包来实现这种目的。使用 `meteor add` 命令即可添加，如果你有额外的预渲染账号并希望进行频繁的缓存更改，可以自由设置你的预渲染口令。
 
