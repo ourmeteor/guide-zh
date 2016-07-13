@@ -110,7 +110,7 @@ meteor add accounts-meteor-developer
 </template>
 ```
 
-Once you've identified which template you need to replace, define a new template. In this case, we want to modify the class on the button to work with the CSS for the rest of the app. There are a few things to keep in mind when overriding a template:一旦确定了要替换哪个模板，就需要自定义一个新的模板。在这个例子中，我们要修改按钮的类定义的 CSS, 在覆盖原模板的时候需要注意以下几点：
+一旦确定了要替换哪个模板，就需要自定义一个新的模板。在这个例子中，我们要修改按钮的类定义的 CSS, 在覆盖原模板的时候需要注意以下几点：
 
 1. 以前模板中 render helpers 的方式保持不变， 在这个例子中我们使用 `buttonText`.
 2. 保留任何 `id` 属性，如 `at-btn`, 因为这些属性在事件处理中有用到。
@@ -187,22 +187,22 @@ AccountsTemplates.configureRoute('resetPwd', {
 
 <h2 id="accounts-password">密码登录</h2>
 
-Meteor comes with a secure and fully-featured password login system out of the box. To use it, add the package:
+Meteor 配有安全和全功能的密码登录系统，需要使用的话要添加包：
 
 ```sh
 meteor add accounts-password
 ```
 
-To see what options are available to you, read the complete description of the [`accounts-password` API in the Meteor docs](http://docs.meteor.com/#/full/accounts_passwords).
+要知道使用这个包可以做什么，请详细阅读[`accounts-password` API 接口文档](http://docs.meteor.com/#/full/accounts_passwords).
 
-<h3 id="requiring-username-email">Requiring username or email</h3>
+<h3 id="requiring-username-email">需要用户名或电子邮件</h3>
 
-> Note: You don't have to do this if you're using `useraccounts`. It disables the regular Meteor client-side account creation functions for you and does custom validation.
+> 注意：如果你正在使用 `useraccounts` 的话可以省略这一步。这一步是禁用通常的 Meteor 客户端账号创建功能，并自定义有效性。
 
-By default, the `Accounts.createUser` function provided by `accounts-password` allows you to create an account with a username, email, or both. Most apps expect a specific combination of the two, so you will certainly want to validate the new user creation:
+默认情况下，`accounts-password` 提供的 `Accounts.createUser` 功能允许你使用用户名，邮件，或者两者创建账户。大多数应用都需要这两者才能创建应用，所以你肯定会希望能够检验新用户创建的有效性：
 
 ```js
-// Ensuring every user has an email address, should be in server-side code
+// 验证每个用户都提供邮件的代码应该放在服务器端
 Accounts.validateNewUser((user) => {
   new SimpleSchema({
     _id: { type: String },
@@ -214,50 +214,50 @@ Accounts.validateNewUser((user) => {
     services: { type: Object, blackbox: true }
   }).validate(user);
 
-  // Return true to allow user creation to proceed
+  // 返回 true 以允许创建新用户
   return true;
 });
 ```
 
-<h3 id="multiple-emails">Multiple emails</h3>
+<h3 id="multiple-emails">多个邮件地址</h3>
 
-Often, users might want to associate multiple email addresses with the same account. `accounts-password` addresses this case by storing the email addresses as an array in the user collection. There are some handy API methods to deal with [adding](http://docs.meteor.com/#/full/Accounts-addEmail), [removing](http://docs.meteor.com/#/full/Accounts-removeEmail), and [verifying](http://docs.meteor.com/#/full/accounts_verifyemail) emails.
+大多数情况下，用户可能会需要关联多个邮件地址到同一个账户。`accounts-password` 通过将邮件地址储存在数组中来解决这个问题。然后用一些方便的 API 接口来处理[添加](http://docs.meteor.com/#/full/Accounts-addEmail), [移除](http://docs.meteor.com/#/full/Accounts-removeEmail), 和[验证](http://docs.meteor.com/#/full/accounts_verifyemail)邮件地址。
 
-One useful thing to add for your app can be the concept of a "primary" email address. This way, if the user has added multiple emails, you know where to send confirmation emails and similar.
+应用中一个有用的功能就是主邮件地址的概念。如果用户添加了多个邮件地址，可以确定将验证邮件发送到主邮件地址。
 
-<h3 id="case-sensitivity">Case sensitivity</h3>
+<h3 id="case-sensitivity">区分大小写</h3>
 
-Before Meteor 1.2, all email addresses and usernames in the database were considered to be case-sensitive. This meant that if you registered an account as `AdaLovelace@example.com`, and then tried to log in with `adalovelace@example.com`, you'd see an error indicating that no user with that email exists. Of course, this can be quite confusing, so we decided to improve things in Meteor 1.2. But the situation was not as simple as it seemed; since MongoDB doesn't have a concept of case-insensitive indexes, it was impossible to guarantee unique emails at the database level. For this reason, we have some special APIs for querying and updating users which manage the case-sensitivity problem at the application level.
+Meteor 1.2 之前，数据库中所有的邮件地址和用户名都是区分大小写的。也就是说，如果你使用 `AdaLovelace@example.com` 注册一个用户，然后使用 `adalovelace@example.com` 登录，会出现该用户不存在的错误信息。这看起来很怪，所以 Meteor 在 @1.2 版本做了改进。但事情远没有想象中简单，因为 MongoDB 没有区分大小写索引的概念，在数据库层面保证邮件地址的唯一性是不可能的。因为这个原因，我们就在应用层面设置一些 API 接口，用于查询和更新用户信息，并用于解决区分大小写的问题。
 
-<h4 id="case-sensitivity-in-my-app">What does this mean for my app?</h4>
+<h4 id="case-sensitivity-in-my-app">这对我的应用来说意味着什么？</h4>
 
-Just follow one simple rule: don't query the database by `username` or `email` directly. Instead, use the [`Accounts.findUserByUsername`](http://docs.meteor.com/#/full/Accounts-findUserByUsername) and [`Accounts.findUserByEmail`](http://docs.meteor.com/#/full/Accounts-findUserByEmail) methods provided by Meteor. This will run a query for you that is case-insensitive, so you will always find the user you are looking for.
+只需要遵循一个简单的原则：不要直接通过 `username` 和 `email` 在数据库中查询信息。而应该使用 Meteor 提供的 [`Accounts.findUserByUsername`](http://docs.meteor.com/#/full/Accounts-findUserByUsername) 和 [`Accounts.findUserByEmail`](http://docs.meteor.com/#/full/Accounts-findUserByEmail). 这样的查询就是区分大小写的，我们才可以确保所查找用户的准确性。
 
-<h3 id="email-flows">Email flows</h3>
+<h3 id="email-flows">电子邮件流量</h3>
 
-When you have a login system for your app based on user emails, that opens up the possibility for email-based account flows. The common thing between all of these workflows is that they involve sending a unique link to the user's email address, which does something special when it is clicked. Let's look at some common examples that Meteor's `accounts-password` package supports out of the box:
+当你应用中的用户登录系统基于电子邮件，就有可能产生基于电子邮件的流量。这些工作流的共同点就是发送一个唯一的链接到用户的邮件地址，当点击链接时会触发不同事件。我们来看一下 Meteor 的 `accounts-password` 包所支持的一些事件：
 
-1. **Password reset.** When the user clicks the link in their email, they are taken to a page where they can enter a new password for their account.
-1. **User enrollment.** A new user is created by an administrator, but no password is set. When the user clicks the link in their email, they are taken to a page where they can set a new password for their account. Very similar to password reset.
-1. **Email verification.** When the user clicks the link in their email, the application records that this email does indeed belong to the correct user.
+1. **密码重置** 当用户点击邮箱中的这个链接时，会跳转到一个输入账户新密码的页面。
+1. **用户注册** 新用户由管理员创建，但未设置密码。当用户点击邮箱中的这个链接时，会跳转到一个设置账户新密码的页面，跟密码重置非常相似。
+1. **邮箱验证** 当用户点击邮箱中的这个链接时，应用会记录到这个邮箱属于正确的用户所有。
 
-Here, we'll talk about how to manage the whole process manually from start to finish.
+我们将讲解一下如何从头到尾手动管理全过程。
 
-<h4 id="default-email-flow">Email works out of the box with accounts UI packages</h4>
+<h4 id="default-email-flow">电子邮件在外部跟账户 UI 包一起使用</h4>
 
-If you want something that just works out of the box, you can use `accounts-ui` or `useraccounts` which basically do everything for you. Only follow the directions below if you definitely want to build all parts of the email flow yourself.
+进一步开发，`accounts-ui` 和 `useraccounts` 可以为你做一些基础工作。如果要自定义邮件流量的话请紧跟以下流程操作。
 
-<h4 id="sending-email">Sending the email</h4>
+<h4 id="sending-email">发送电子邮件</h4>
 
-`accounts-password` comes with handy functions that you can call from the server to send an email. They are named for exactly what they do:
+`accounts-password` 自带可以在服务器端调用的用于发送邮件的函数。按照实际功能命名：
 
 1. [`Accounts.sendResetPasswordEmail`](http://docs.meteor.com/#/full/accounts_sendresetpasswordemail)
 2. [`Accounts.sendEnrollmentEmail`](http://docs.meteor.com/#/full/accounts_sendenrollmentemail)
 3. [`Accounts.sendVerificationEmail`](http://docs.meteor.com/#/full/accounts_sendverificationemail)
 
-The email is generated using the email templates from [Accounts.emailTemplates](http://docs.meteor.com/#/full/accounts_emailtemplates), and include links generated with `Accounts.urls`. We'll go into more detail about customizing the email content and URL later.
+邮件通过邮件模板[Accounts.emailTemplates](http://docs.meteor.com/#/full/accounts_emailtemplates)生成，包含 `Accounts.urls` 生成的链接。我们接下来会讲解更多自定义右键模板和链接的内容。
 
-<h4 id="identifying-link-click">Identifying when the link is clicked</h4>
+<h4 id="identifying-link-click">识别链接被点击了</h4>
 
 When the user receives the email and clicks the link inside, their web browser will take them to your app. Now, you need to be able to identify these special links and act appropriately. If you haven't customized the link URL, then you can use some built-in callbacks to identify when the app is in the middle of an email flow.
 
