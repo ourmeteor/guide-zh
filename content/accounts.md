@@ -259,19 +259,19 @@ Meteor 1.2 之前，数据库中所有的邮件地址和用户名都是区分大
 
 <h4 id="identifying-link-click">识别链接被点击了</h4>
 
-When the user receives the email and clicks the link inside, their web browser will take them to your app. Now, you need to be able to identify these special links and act appropriately. If you haven't customized the link URL, then you can use some built-in callbacks to identify when the app is in the middle of an email flow.
+当用户收到邮件并且点击了链接，浏览器会把他们带到应用的界面。现在我们需要识别这些特殊的链接并链接到特定页面。如果还没有自定义链接，你可以使用一些内置的回调来确定邮件流量可以接入你的应用。
 
-Normally, when the Meteor client connects to the server, the first thing it does is pass the _login resume token_ to re-establish a previous login. However, when these callbacks from the email flow are triggered, the resume token is not sent until your code signals that it has finished handling the request by calling the `done` function that is passed into the registered callback. This means that if you were previously logged in as user A, and then you clicked the reset password link for user B, but then you cancelled the password reset flow by calling `done()`, the client would log in as A again.
+通常情况下，当 Meteor 的客户端连接到服务器端时做的第一件事就是传递恢复登录界面的口令，以便重建之前的登录界面。但是，当这些邮件流量中的回调被触发时，不会马上传递恢复口令，要等到传递给注册回调的 `done` 函数被调用，才会传递恢复口令。这意味着如果你之前以用户 A 的身份登陆，然后你点击了用户 B 的密码重置链接，然后你又调用 `done()` 来取消密码重置流程，客户端会保持以用户 A 身份登陆。
 
 1. [`Accounts.onResetPasswordLink`](http://docs.meteor.com/#/full/Accounts-onResetPasswordLink)
 2. [`Accounts.onEnrollmentLink`](http://docs.meteor.com/#/full/Accounts-onEnrollmentLink)
 3. [`Accounts.onEmailVerificationLink`](http://docs.meteor.com/#/full/Accounts-onEmailVerificationLink)
 
-Here's how you would use one of these functions:
+在这里我们可以看一下如何使用这些函数：
 
 ```js
 Accounts.onResetPasswordLink((token, done) => {
-  // Display the password reset UI, get the new password...
+  // 显示密码重置界面，获得新密码...
 
   Accounts.resetPassword(token, newPassword, (err) => {
     if (err) {
@@ -284,7 +284,7 @@ Accounts.onResetPasswordLink((token, done) => {
 })
 ```
 
-If you want a different URL for your reset password page, you need to customize it using the `Accounts.urls` option:
+如果想要一个不同的 URL 来链接到密码重置页面，可以通过 `Accounts.urls` 选项自定义：
 
 ```js
 Accounts.urls.resetPassword = (token) => {
@@ -292,22 +292,22 @@ Accounts.urls.resetPassword = (token) => {
 };
 ```
 
-If you have customized the URL, you will need to add a new route to your router that handles the URL you have specified, and the default `Accounts.onResetPasswordLink` and friends won't work for you.
+如果你自定义了 URL, 需要在路由中添加路径处理该 URL, `Accounts.onResetPasswordLink` 就退役啦。
 
-<h4 id="completing-email-flow">Displaying an appropriate UI and completing the process</h4>
+<h4 id="completing-email-flow">显示相应的用户界面，并完成该进程</h4>
 
-Now that you know that the user is attempting to reset their password, set an initial password, or verify their email, you should display an appropriate UI to allow them to do so. For example, you might want to show a page with a form for the user to enter their new password.
+现在你知道用户试图重置密码，或者设置初始密码，或者验证邮箱，应该有一个友好的界面方便用户这样操作。例如，可以设置一个页面表单用户可以输入密码。
 
-When the user submits the form, you need to call the appropriate function to commit their change to the database. Each of these functions takes the new value and the token you got from the event in the previous step.
+当用户提交表单后，你需要调用合适的函数将改变提交到数据库。这里的每个函数需要用到新值以及上一步获得的口令。
 
-1. [`Accounts.resetPassword`](http://docs.meteor.com/#/full/accounts_resetpassword) - this one should be used both for resetting the password, and enrolling a new user; it accepts both kinds of tokens.
+1. [`Accounts.resetPasswords`] —— 该函数应该被用于重置密码和用户注册；两种口令都可以接收。
 2. [`Accounts.verifyEmail`](http://docs.meteor.com/#/full/accounts_verifyemail)
 
-After you have called one of the two functions above or the user has cancelled the process, call the `done` function you got in the link callback. This will tell Meteor to get out of the special state it enters when you're doing one of the email account flows.
+当你调用了上面两个函数中的其中一个或者用户取消了进程，在链接的回调中调用 `done` 函数。也就是说，当你试图重置密码，或新用户注册，或验证邮箱时，调用 `done` 函数都会通知 Meteor 会从目前的状态跳出来。
 
-<h3 id="customizing-emails">Customizing accounts emails</h3>
+<h3 id="customizing-emails">自定义账户邮件</h3>
 
-You will probably want to customize the emails `accounts-password` will send on your behalf. This can be easily done through the [`Accounts.emailTemplates` API](http://docs.meteor.com/#/full/accounts_emailtemplates). Below is some example code from the Todos app:
+你可能会想要自定义 `accounts-password` 发出的邮件模板。这可以通过[`Accounts.emailTemplates` API](http://docs.meteor.com/#/full/accounts_emailtemplates)轻松做到。下面是 Todos 应用的参考代码：
 
 ```js
 Accounts.emailTemplates.siteName = "Meteor Guide Todos Example";
@@ -327,25 +327,25 @@ The Meteor Todos team
 `
   },
   html(user, url) {
-    // This is where HTML email content would go.
-    // See the section about html emails below.
+    // 这里包含 HTML 邮件内容
+    // 下面章节会讲到 HTML 邮件
   }
 };
 ```
 
-As you can see, we can use the ES2015 template string functionality to generate a multi-line string that includes the password reset URL. We can also set a custom `from` address and email subject.
+正如你所看到的，我们可以使用 ES2015 模板字符串的功能，生成一个多行字符串，其中包括密码重置 URL。我们还可以设置自定义 `from` 地址和电子邮件的主题。
 
-<h4 id="html-emails">HTML emails</h4>
+<h4 id="html-emails">HTML 邮件</h4>
 
-If you've ever needed to deal with sending pretty HTML emails from an app, you know that it can quickly become a nightmare. Compatibility of popular email clients with basic HTML features like CSS is notoriously spotty, so it is hard to author something that works at all. Start with a [responsive email template](https://github.com/leemunroe/responsive-html-email-template) or [framework](http://foundation.zurb.com/emails/email-templates.html), and then use a tool to convert your email content into something that is compatible with all email clients. [This blog post by Mailgun covers some of the main issues with HTML email.](http://blog.mailgun.com/transactional-html-email-templates/) In theory, a community package could extend Meteor's build system to do the email compilation for you, but at the time of writing we were not aware of any such packages.
+如果你曾经需要通过应用发送漂亮的 HTML 邮件，你应该知道这是怎样的一场噩梦。流行的电子邮件客户端对基本的 HTML 功能如 CSS 的兼容性是出了名的参差不齐，所以创作出在所有客户端都兼容的 HTML 邮件是很难的。从[响应电子邮件模板](https://github.com/leemunroe/responsive-html-email-template) 或 [框架](http://foundation.zurb.com/emails/email-templates.html)开始，然后使用工具将邮件转换为可以兼容所有邮件客户端。[Mailgun 发表的一篇文章讲解了一些 HTML 邮件的主要知识](http://blog.mailgun.com/transactional-html-email-templates/)。理论上，一个社区包可以扩展 Meteor 的构建系统并为你做邮件的编译，但在写这些教程的时候我们还没发现社区上有这种包。
 
-<h2 id="oauth">OAuth login</h2>
+<h2 id="oauth">授权登录</h2>
 
-In the distant past, it could have been a huge headache to get Facebook or Google login to work with your app. Thankfully, most popular login providers have standardized around some version of [OAuth](https://en.wikipedia.org/wiki/OAuth), and Meteor supports some of the most popular login services out of the box.
+在很久很久以前，让用户通过 Facebook 或者 Google 登录应用是一件很令人头疼的事。幸运的是，目前大多数登录供应商提供标准的登录[授权](https://en.wikipedia.org/wiki/OAuth) API 接口，Meteor 也支持一些最流行的登录方式接口。
 
 <h3 id="supported-login-services">Facebook, Google, and more</h3>
 
-Here's a complete list of login providers for which Meteor actively maintains core packages:
+下面是 Meteor 精心维护的登录供应商的完整列表：
 
 1. Facebook with `accounts-facebook`
 2. Google with `accounts-google`
@@ -354,11 +354,11 @@ Here's a complete list of login providers for which Meteor actively maintains co
 5. Meetup with `accounts-meetup`
 6. Meteor Developer Accounts with `accounts-meteor-developer`
 
-There is a package for logging in with Weibo, but it is no longer being actively maintained.
+有一个包是专门用于连接微博登陆接口的，但现在已经没怎么有人维护了。
 
-<h3 id="oauth-logging-in">Logging in</h3>
+<h3 id="oauth-logging-in">登录</h3>
 
-If you are using an off-the-shelf login UI like `accounts-ui` or `useraccounts`, you don't need to write any code after adding the relevant package from the list above. If you are building a login experience from scratch, you can log in programmatically using the [`Meteor.loginWith<Service>`](http://docs.meteor.com/#/full/meteor_loginwithexternalservice) function. It looks like this:
+如果你使用  `accounts-ui` 或者 `useraccounts` 等现成的登录 UI 系统，则在添加好上述包后不再需要写任何代码。如果你从头开始自定义一个登录界面，可以通过[`Meteor.loginWith<Service>`](http://docs.meteor.com/#/full/meteor_loginwithexternalservice)函数实现登录功能，代码如下：
 
 ```js
 Meteor.loginWithFacebook({
@@ -372,9 +372,9 @@ Meteor.loginWithFacebook({
 });
 ```
 
-<h3 id="oauth-configuration">Configuring OAuth</h3>
+<h3 id="oauth-configuration">配置授权</h3>
 
-There are a few points to know about configuring OAuth login:
+配置授权登录需要知道以下几点：
 
 1. **Client ID and secret.** It's best to keep your OAuth secret keys outside of your source code, and pass them in through Meteor.settings. Read how in the [Security article](security.html#api-keys-oauth).
 2. **Redirect URL.** On the OAuth provider's side, you'll need to specify a _redirect URL_. The URL will look like: `https://www.example.com/_oauth/facebook`. Replace `facebook` with the name of the service you are using. Note that you will need to configure two URLs - one for your production app, and one for your development environment, where the URL might be something like `http://localhost:3000/_oauth/facebook`.
