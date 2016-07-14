@@ -376,55 +376,55 @@ Meteor.loginWithFacebook({
 
 配置授权登录需要知道以下几点：
 
-1. **Client ID and secret.** It's best to keep your OAuth secret keys outside of your source code, and pass them in through Meteor.settings. Read how in the [Security article](security.html#api-keys-oauth).
-2. **Redirect URL.** On the OAuth provider's side, you'll need to specify a _redirect URL_. The URL will look like: `https://www.example.com/_oauth/facebook`. Replace `facebook` with the name of the service you are using. Note that you will need to configure two URLs - one for your production app, and one for your development environment, where the URL might be something like `http://localhost:3000/_oauth/facebook`.
-3. **Permissions.** Each login service provider should have documentation about which permissions are available. For example, [here is the page for Facebook](https://developers.facebook.com/docs/facebook-login/permissions). If you want additional permissions to the user's data when they log in, pass some of these strings in the `requestPermissions` option to `Meteor.loginWithFacebook` or [`Accounts.ui.config`](http://docs.meteor.com/#/full/accounts_ui_config). In the next section we'll talk about how to retrieve that data.
+1. **客户端 ID 和密钥** 最好的方法是将授权密钥保存在源代码之外，然后通过 Meteor.settings 传递。了解如何操作请阅读[安全性章节](security.html#api-keys-oauth).
+2. **URL 重定向** 对于授权提供方来说，你需要提供重定向的 URL。URL 大概长这样 `https://www.example.com/_oauth/facebook`. 将 `facebook` 换成你所使用的服务提供商的名字。注意到你需要配置两个 URL —— 一个用于你的应用，一个用于开发环境，开发环境的 URL 大概长这样 `http://localhost:3000/_oauth/facebook`.
+3. **权限** 每个授权提供商都应该有文档说明提供哪些权限接口。例如，[这是 Facebook 的文档](https://developers.facebook.com/docs/facebook-login/permissions).如果你还需要所登录用户的额外信息，将 `requestPermissions` 选项中提供的某些字符串传递给 `Meteor.loginWithFacebook` 或者[`Accounts.ui.config`](http://docs.meteor.com/#/full/accounts_ui_config)。在下一章节我们会讲解如何获取额外信息。
 
-<h3 id="oauth-calling-api">Calling service API for more data</h3>
+<h3 id="oauth-calling-api">调用服务 API 获得更多数据</h3>
 
-If your app supports or even requires login with an external service such as Facebook, it's natural to also want to use that service's API to request additional data about that user. For example, you might want to get a list of a Facebook user's photos.
+如果你的应用支持或者要求用户使用 Facebook 登录，我们通过 Facebook API 获取用户额外的信息，例如用户的照片列表就变得顺理成章了。
 
-First, you'll need to request the relevant permissions when logging in the user. See the [section above](#oauth-configuration) for how to pass those options.
+首先，需要在用户登录时请求相关权限。查看[上文](#oauth-configuration)如何传递这些选项。
 
-Then, you need to get the user's access token. You can find this token in the `Meteor.users` collection under the `services` field. For example, if you wanted to get a particular user's Facebook access token:
+然后，需要获得用户的访问口令。可以在 `Meteor.users` 数据集中的 `services` 属性找到该口令。例如，如果想要获得某一用户的 Facebook 访问口令：
 
 ```js
-// Given a userId, get the user's Facebook access token
+// 给定一个 userId，获得用户的 Facebook 访问口令
 const user = Meteor.users.findOne(userId);
 const fbAccessToken = user.services.facebook.accessToken;
 ```
 
-For more details about the data stored in the user database, read the section below about accessing user data.
+下面我们会细讲用户数据库中存储的数据，以及如何获取用户数据。
 
 Now that you have the access token, you need to actually make a request to the appropriate API. Here you have two options:
 
-1. Use the [`http` package](http://docs.meteor.com/#/full/http) to access the service's API directly. You'll probably need to pass the access token from above in a header. For details you'll need to search the API documentation for the service.
-2. Use a package from Atmosphere or npm that wraps the API into a nice JavaScript interface. For example, if you're trying to load data from Facebook you could use the [fbgraph](https://www.npmjs.com/package/fbgraph) npm package. Read more about how to use npm with your app in the [Build System article](build-tool.html#npm).
+1. 使用[`http` 包](http://docs.meteor.com/#/full/http)直接获取服务 API 接口。你可能需要在刚开始时就传递上面的访问口令。要详细了解请阅读相关服务的 API 接口文档。 
+2. 使用 tmosphere 或者 npm 上面的包，这些包会将 API 接口封装成非常漂亮的 JavaScript 界面。例如，如果需要加载来自 Facebook 的数据可以使用[fbgraph](https://www.npmjs.com/package/fbgraph) npm 包。了解如何在你的应用中使用 npm 包请阅读[系统构建章节](build-tool.html#npm)。
 
-<h2 id="displaying-user-data">Loading and displaying user data</h2>
+<h2 id="displaying-user-data">加载和显示用户数据</h2>
 
-Meteor's accounts system, as implemented in `accounts-base`, also includes a database collection and generic functions for getting data about users.
+.Meteor 的账户系统，跟我们在 `accounts-base` 中展示的一样，同样包括数据库数据集和获取用户数据的函数功能。
 
-<h3 id="current-user">Currently logged in user</h3>
+<h3 id="current-user">当前登录的用户</h3>
 
-Once a user is logged into your app with one of the methods described above, it is useful to be able to identify which user is logged in, and get the data provided during the registration process.
+一旦用户通过上面的任何一种方法登录到你的应用，识别是哪一个用户登录，并在注册的时候获取用户信息。
 
-<h4 id="current-user-client">On the client: Meteor.userId()</h4>
+<h4 id="current-user-client">客户端：Meteor.userId()</h4>
 
-For code that runs on the client, the global `Meteor.userId()` reactive function will give you the ID of the currently logged in user.
+在客户端上运行的代码，全局 `Meteor.userId()` 函数可以提供目前登录用户的 ID。
 
-In addition to that core API, there are some helpful shorthand helpers: `Meteor.user()`, which is exactly equal to calling `Meteor.users.findOne(Meteor.userId())`, and the `{% raw %}{{currentUser}}{% endraw %}` Blaze helper that returns the value of `Meteor.user()`.
+除了 `Meteor.userId()` 这种核心 API, 还有一些同样容易记住的 helpers: `Meteor.user()`，等价于 `Meteor.users.findOne(Meteor.userId())`，另外，`{% raw %}{{currentUser}}{% endraw %}` Blaze helper 返回 `Meteor.user()` 的值。
 
-Note that there is a benefit to restricting the places you access the current user to make your UI more testable and modular. Read more about this in the [UI article](ui-ux.html#global-stores).
+请注意，适当在应用中限制使用 “获得当前用户” 的功能可以使得一样更加模块化，测试起来更容易。要了解更多相关信息请阅读[UI 章节](ui-ux.html#global-stores)。
 
-<h4 id="current-user-server">On the server: this.userId</h4>
+<h4 id="current-user-server">服务器端：this.userId</h4>
 
-On the server, each connection has a different logged in user, so there is no global logged-in user state by definition. Since Meteor tracks the environment for each Method call, you can still use the `Meteor.userId()` global, which returns a different value depending on which Method you call it from, but you can run into edge cases when dealing with asynchronous code. Also, `Meteor.userId()` won't work inside publications.
+在客户端，每个连接所对应的用户都不一样，所以没有全局登录用户的概念。但是因为 Meteor 会在每次调用 Method 后跟踪环境，所以还是可以使用 全局 `Meteor.userId()`，根据调用方法的不同返回不同的值，但在使用异步代码时可能会遇到边缘情况。另外，`Meteor.userId()` 也不可以在 publications 中使用。
 
-We suggest using the `this.userId` property on the context of Methods and publications instead, and passing that around through function arguments to wherever you need it.
+我们建议在 Method 和 publication 中使用 `this.userId`，并将其作为函数参数传递。
 
 ```js
-// Accessing this.userId inside a publication
+// 在一个 publication 中获取 this.userId
 Meteor.publish('lists.private', function() {
   if (!this.userId) {
     return this.ready();
@@ -439,7 +439,7 @@ Meteor.publish('lists.private', function() {
 ```
 
 ```js
-// Accessing this.userId inside a Method
+// 在一个 Method 中获取 this.userId
 Meteor.methods({
   'todos.updateText'({ todoId, newText }) {
     new SimpleSchema({
@@ -461,7 +461,7 @@ Meteor.methods({
 });
 ```
 
-<h3 id="meteor-users-collection">The Meteor.users collection</h3>
+<h3 id="meteor-users-collection">Meteor.users 数据集</h3>
 
 Meteor comes with a default MongoDB collection for user data. It's stored in the database under the name `users`, and is accessible in your code through `Meteor.users`. The schema of a user document in this collection will depend on which login service was used to create the account. Here's an example of a user that created their account with `accounts-password`:
 
