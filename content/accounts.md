@@ -463,7 +463,7 @@ Meteor.methods({
 
 <h3 id="meteor-users-collection">Meteor.users 数据集</h3>
 
-Meteor comes with a default MongoDB collection for user data. It's stored in the database under the name `users`, and is accessible in your code through `Meteor.users`. The schema of a user document in this collection will depend on which login service was used to create the account. Here's an example of a user that created their account with `accounts-password`:
+Meteor 带有一个默认的 MongoDB 数据库用于储存用户数据。用户数据储存在数据库 `users` 数据集中，通过 `Meteor.users` 可以获取。一个用户的信息在数据集中的结构跟注册时所使用的服务有关。下面是一个通过 `accounts-password` 创建的用户数据结构：
 
 ```js
 {
@@ -491,7 +491,7 @@ Meteor comes with a default MongoDB collection for user data. It's stored in the
 }
 ```
 
-Here's what the same user would look like if they instead logged in with Facebook:
+下面是一个通过 Facebook 创建的用户数据结构：
 
 ```js
 {
@@ -528,23 +528,23 @@ Here's what the same user would look like if they instead logged in with Faceboo
 }
 ```
 
-Note that the schema is different when users register with different login services. There are a few things to be aware of when dealing with this collection:
+请注意，当用户使用不同的登录服务注册时所得到用户数据结构是不一样的。当处理用户数据集的时候应该注意以下几点：
 
 1. User documents in the database have secret data like access keys and hashed passwords. When [publishing user data to the client](#publish-custom-data), be extra careful not to include anything that client shouldn't be able to see.
 2. DDP, Meteor's data publication protocol, only knows how to resolve conflicts in top-level fields. This means that you can't have one publication send `services.facebook.first_name` and another send `services.facebook.locale` - one of them will win, and only one of the fields will actually be available on the client. The best way to fix this is to denormalize the data you want onto custom top-level fields, as described in the section about [custom user data](#custom-user-data).
 3. The OAuth login service packages populate `profile.name`. We don't recommend using this but, if you plan to, make sure to deny client-side writes to `profile`. See the section about the [`profile` field on users](dont-use-profile).
 4. When finding users by email or username, make sure to use the case-insensitive functions provided by `accounts-password`. See the [section about case-sensitivity](#case-sensitivity) for more details.
 
-<h2 id="custom-user-data">Custom data about users</h2>
+<h2 id="custom-user-data">自定义用户数据</h2>
 
 As your app gets more complex, you will invariably need to store some data about individual users, and the most natural place to put that data is in additional fields on the `Meteor.users` collection described above. In a more normalized data situation it would be a good idea to keep Meteor's user data and yours in two separate tables, but since MongoDB doesn't deal well with data associations it makes sense to just use one collection.
 
-<h3 id="top-level-fields">Add top-level fields onto the user document</h3>
+<h3 id="top-level-fields">添加顶级域到用户文件</h3>
 
 The best way to store your custom data onto the `Meteor.users` collection is to add a new uniquely-named top-level field on the user document. For example, if you wanted to add a mailing address to a user, you could do it like this:
 
 ```js
-// Using address schema from schema.org
+// 使用 schema.org 提供的地址结构
 // https://schema.org/PostalAddress
 const newMailingAddress = {
   addressCountry: 'US',
@@ -561,12 +561,12 @@ Meteor.users.update(userId, {
 });
 ```
 
-<h3 id="adding-fields-on-registration">Adding fields on user registration</h3>
+<h3 id="adding-fields-on-registration">在用户注册添加新字段</h3>
 
-The code above is just code that you could run on the server inside a Meteor Method to set someone's mailing address. Sometimes, you want to set a field when the user first creates their account, for example to initialize a default value or compute something from their social data. You can do this using [`Accounts.onCreateUser`](http://docs.meteor.com/#/full/accounts_oncreateuser):
+上面的代码只可以在服务器端 Meteor Method 中运行，用于设置用户的 邮箱地址。当用户新建账户时，有时我们可能会需要设置一个新的域，例如初始化默认值或者计算用户的社交数据。要这样做可以采用[`Accounts.onCreateUser`](http://docs.meteor.com/#/full/accounts_oncreateuser):
 
 ```js
-// Generate user initials after Facebook login
+// 使用 Facebook 登录后初始化用户
 Accounts.onCreateUser((options, user) => {
   if (! user.services.facebook) {
     throw new Error('Expected login with Facebook only.');
@@ -575,65 +575,65 @@ Accounts.onCreateUser((options, user) => {
   const { first_name, last_name } = user.services.facebook;
   user.initials = first_name[0].toUpperCase() + last_name[0].toUpperCase();
 
-  // Don't forget to return the new user object at the end!
+  // 最后不要忘记返回新的用户对象！
   return user;
 });
 ```
 
-Note that the `user` object provided doesn't have an `_id` field yet. If you need to do something with the new user's ID inside this function, a useful trick can be to generate the ID yourself:
+注意到上面提到的 `user` 还没有 `_id` 域。如果在该函数中我们需要使用用户 ID，那么我们使用的小技能就是自定义一个用户 ID.
 
 ```js
-// Generate a todo list for each new user
+// 为每一位新用户生成 todo 列表
 Accounts.onCreateUser((options, user) => {
-  // Generate a user ID ourselves
-  user._id = Random.id(); // Need to add the `random` package
+  // 自定义用户 ID
+  user._id = Random.id(); // 需要添加 `random` 包
 
-  // Use the user ID we generated
+  // 使用我们自定义的用户 ID
   Lists.createListForUser(user._id);
 
-  // Don't forget to return the new user object at the end!
+  // 最后不要忘记返回新的用户对象！
   return user;
 });
 ```
 
-<h3 id="dont-use-profile">Don't use profile</h3>
+<h3 id="dont-use-profile">不要使用 profile</h3>
 
-There's a tempting existing field called `profile` that is added by default when a new user registers. This field was historically intended to be used as a scratch pad for user-specific data - maybe their image avatar, name, intro text, etc. Because of this, **the `profile` field on every user is automatically writeable by that user from the client**. It's also automatically published to the client for that particular user.
+默认情况下新用户注册时会生成一个 `profile` 临时域。该域原先是为了存储用户特定的数据 —— 例如用户的图像，名字，简介等。因为这个原因，**每个用户的 `profile` 域都可以通过客户端实现更新**。该数据也会自动发布到该用户客户端。
 
-It turns out that having a field writeable by default without making that super obvious might not be the best idea. There are many stories of new Meteor developers storing fields such as `isAdmin` on `profile`... and then a malicious user can easily set that to true whenever they want, making themselves an admin. Even if you aren't concerned about this, it isn't a good idea to let malicious users store arbitrary amounts of data in your database.
+事实证明，数据集中有一个可写入的域，但却有很多人不知道，显然不太说得过去。之前有很多 Meteor 新开发者将类似 `isAdmin` 判断条件存储在 `profile`，然后恶意用户可以将判断条件设置为 true，这样他们就是管理员了。即使这不是你的关注点，但我想你应该也不希望恶意用户将杂七杂八的数据存储到你的数据库吧。
 
-Rather than dealing with the specifics of this field, it can be helpful to just ignore its existence entirely. You can safely do that as long as you deny all writes from the client:
+与其花费精力处理这个域，不如直接忽略掉它。最安全的做法就是对改域禁止任何来自客户端的更新：
 
 ```js
-// Deny all client-side updates to user documents
+// 禁止任何客户端更新用户文档
 Meteor.users.deny({
   update() { return true; }
 });
 ```
 
-Even ignoring the security implications of `profile`, it isn't a good idea to put all of your app's custom data onto one field. As discussed in the [Collections article](collections.html#schema-design), Meteor's data transfer protocol doesn't do deeply nested diffing of fields, so it's a good idea to flatten out your objects into many top-level fields on the document.
+即使忽略 `profile` 的安全性使用，将应用中所有自定义的数据都放在一个域里面也不是一个好主意。正如我们在[数据集文章](collections.html#schema-design)中所讨论的，Meteor 的数据传输协议不做域的深度嵌套区别，所以最好将数据对象扁平化然后作为顶级域插入数据集。
 
-<h3 id="publish-custom-data">Publishing custom data</h3>
+<h3 id="publish-custom-data">发布自定义数据</h3>
 
-If you want to access the custom data you've added to the `Meteor.users` collection in your UI, you'll need to publish it to the client. Mostly, you can just follow the advice in the [Data Loading](data-loading.html#publications) and [Security](security.html#publications) articles.
+如果要在客户端获取你添加到 `Meteor.users` 数据集的自定义数据，首先需要将数据发布到客户端。我们在文章[数据加载](data-loading.html#publications) 和 [安全性](security.html#publications)中有讲到相关知识和建议，请自行阅读。
 
-The most important thing to keep in mind is that user documents are certain to contain private data about your users. In particular, the user document includes hashed password data and access keys for external APIs. This means it's critically important to [filter the fields](http://guide.meteor.com/security.html#fields) of the user document that you send to any client.
+要记住的一件至关重要的事情是用户文件肯定会包含用户的私人信息。特别是用户文件中包含哈希密码和外部 API 接口的访问密钥。这说明[过滤掉相关域](http://guide.meteor.com/security.html#fields)后再将数据发布到客户端是至关重要的一步。
 
-Note that in Meteor's publication and subscription system, it's totally fine to publish the same document multiple times with different fields - they will get merged internally and the client will see a consistent document with all of the fields together. So if you just added one custom field, you should just write a publication with that one field. Let's look at an example of how we might publish the `initials` field from above:
+在 Meteor 的 publication 和 subscription 系统中，是可以在不同的域中多次发布同一个文件的 —— 这些文件内部会进行合并，用户在客户端看到的是不同域合并在一起的最后文件。所以如果只自定义了一个域，那么就只需要为这个域写一个发布。下面我们看一下如何发布上面提到的 `initials` 域。
 
 ```js
 Meteor.publish('Meteor.users.initials', function ({ userIds }) {
-  // Validate the arguments to be what we expect
+  // 按我们的要求验证参数有效性
   new SimpleSchema({
     userIds: { type: [String] }
   }).validate({ userIds });
 
-  // Select only the users that match the array of IDs passed in
+  // 只选中匹配该 ID 数组的用户
   const selector = {
     _id: { $in: userIds }
   };
 
-  // Only return one field, `initials`
+  // 只返回一个域 `initials`
   const options = {
     fields: { initials: 1 }
   };
@@ -642,14 +642,14 @@ Meteor.publish('Meteor.users.initials', function ({ userIds }) {
 });
 ```
 
-This publication will let the client pass an array of user IDs it's interested in, and get the initials for all of those users.
+这个 publication 会让客户端获取它所感兴趣的 ID 数组内的用户，并将初始值设置为 1。
 
-<h2 id="roles-and-permissions">Roles and permissions</h2>
+<h2 id="roles-and-permissions">角色和权限</h2>
 
 One of the main reasons you might want to add a login system to your app is to have permissions for your data. For example, if you were running a forum, you would want administrators or moderators to be able to delete any post, but normal users can only delete their own. This uncovers two different types of permissions:
 
-1. Role-based permissions
-2. Per-document permissions
+1. 角色权限
+2. 单个文件权限
 
 <h3 id="alanning-roles">alanning:roles</h3>
 
@@ -701,7 +701,7 @@ Lists.helpers({
 });
 ```
 
-Now, we can call this simple function to determine if a particular user is allowed to edit this list:
+现在我们可以调用这个简单的函数来决定一个特定的用户是否有编辑权限：
 
 ```js
 const list = Lists.findOne(listId);
@@ -712,4 +712,4 @@ if (! list.editableBy(userId)) {
 }
 ```
 
-Learn more about how to use collection helpers in the [Collections article](collections.html#collection-helpers).
+要学习更多关于数据集 helper 的知识请阅读[数据集章节](collections.html#collection-helpers)。
