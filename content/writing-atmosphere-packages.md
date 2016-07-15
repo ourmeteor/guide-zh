@@ -1,17 +1,17 @@
 ---
-title: Writing Atmosphere Packages
+title: 写一个 Atmosphere 包
 order: 29
 discourseTopicId: 20194
 ---
 
-To get started writing a package, use the Meteor command line tool:
+要开始写一个包，请使用 Meteor 命令行工具：
 
 ```bash
 meteor create --package my-package
 ```
-> It is required that your `my-package` name take the form of `username:my-package`, where `username` is your Meteor Developer username, if you plan to publish your package to Atmosphere.
+> 如果要把写的包发布到 Atmosphere，按要求，`my-package` 的名称应该按照 `username:my-package` 这种格式命名，`username`是 Meteor 开发者的名字。
 
-If you run this inside an app, it will place the newly generated package in that app's `packages/` directory. Outside an app, it will just create a standalone package directory. The command also generates some boilerplate files for you:
+如果你在一个应用中执行该命令，新生成的包会被放置在 `packages/` 目录。如果在应用之外执行，则只会生成一个单独的包目录文件夹。伴随生成的还有一些样本文件：
 
 ```txt
 my-package
