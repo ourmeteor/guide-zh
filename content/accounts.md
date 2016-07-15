@@ -27,7 +27,7 @@ DDP 是 Meteor 的内置 pub/sub 和 RPC 协议。你可以从 [数据加载](da
 
 <h3 id="accounts-base">`accounts-base`</h3>
 
-T这个包是 Meteor 面向开发者的用户账号功能的核心，包含：
+这个包是 Meteor 面向开发者的用户账号功能的核心，包含：
 
 1. 有着标准架构的用户集，用户集通过 [`Meteor.users`](http://docs.meteor.com/#/full/meteor_users) 获取，[`Meteor.userId()`](http://docs.meteor.com/#/full/meteor_userid) 和 [`Meteor.user()`](http://docs.meteor.com/#/full/meteor_user) 代表客户端的用户的登录状态。
 2. 有很多有用且通用的 Methods 可以跟踪登录状态，退出登录状态，用户验证等，访问 [Accounts section of the docs](http://docs.meteor.com/#/full/accounts_api) 获取完整列表。
@@ -68,7 +68,7 @@ meteor add accounts-meteor-developer
 
 <img src="images/accounts-ui.png">
 
-<h2 id="useraccounts">Customizable UI: useraccounts</h2>
+<h2 id="useraccounts">自定义 UI: useraccounts</h2>
 
 一旦建立了运行 `accounts-ui` 的应用原型，你就会想要实现更强大和更配置化的功能，这样就可以更好地把登录流程整合到应用中。[`useraccounts` 家庭包](http://useraccounts.meteor.com/)是 Meteor 最强大的一组账户管理 UI 控制包。
 
@@ -396,7 +396,7 @@ const fbAccessToken = user.services.facebook.accessToken;
 
 下面我们会细讲用户数据库中存储的数据，以及如何获取用户数据。
 
-Now that you have the access token, you need to actually make a request to the appropriate API. Here you have two options:
+现在你已经获取了访问口令，还需要向对于的 API 接口发送一个请求。有两种选择：
 
 1. 使用[`http` 包](http://docs.meteor.com/#/full/http)直接获取服务 API 接口。你可能需要在刚开始时就传递上面的访问口令。要详细了解请阅读相关服务的 API 接口文档。 
 2. 使用 tmosphere 或者 npm 上面的包，这些包会将 API 接口封装成非常漂亮的 JavaScript 界面。例如，如果需要加载来自 Facebook 的数据可以使用[fbgraph](https://www.npmjs.com/package/fbgraph) npm 包。了解如何在你的应用中使用 npm 包请阅读[系统构建章节](build-tool.html#npm)。
@@ -530,18 +530,18 @@ Meteor 带有一个默认的 MongoDB 数据库用于储存用户数据。用户�
 
 请注意，当用户使用不同的登录服务注册时所得到用户数据结构是不一样的。当处理用户数据集的时候应该注意以下几点：
 
-1. User documents in the database have secret data like access keys and hashed passwords. When [publishing user data to the client](#publish-custom-data), be extra careful not to include anything that client shouldn't be able to see.
-2. DDP, Meteor's data publication protocol, only knows how to resolve conflicts in top-level fields. This means that you can't have one publication send `services.facebook.first_name` and another send `services.facebook.locale` - one of them will win, and only one of the fields will actually be available on the client. The best way to fix this is to denormalize the data you want onto custom top-level fields, as described in the section about [custom user data](#custom-user-data).
-3. The OAuth login service packages populate `profile.name`. We don't recommend using this but, if you plan to, make sure to deny client-side writes to `profile`. See the section about the [`profile` field on users](dont-use-profile).
-4. When finding users by email or username, make sure to use the case-insensitive functions provided by `accounts-password`. See the [section about case-sensitivity](#case-sensitivity) for more details.
+1. 数据库中的用户文件包含访问密钥和哈希密码等秘密数据。当[将数据发布到客户端时](#publish-custom-data)，要注意哪些数据是不能发布到客户端的。
+2. DDP 是 Meteor 的数据发布协议，该协议只知道如何处理顶级域的冲突。这意味着你不能同时使用不同的 publication 发送 `services.facebook.first_name` 和 `services.facebook.locale` —— 只能执行其中一个 publication，客户端也只能显示一个域。解决这个问题最好的办法是 将要放到自定义顶级域的数据非标准化，如我们下文[自定义用户数据](#custom-user-data)所讲的一样。
+3. 授权登录服务包会填充 `profile.name`，我们并不支持使用 `profile`，但是你一定要用，请注意一定要禁止客户端对 `profile` 的写入。了解更多请查看[用户信息中的 `profile` 域](dont-use-profile)。
+4. 要通过电子邮件或者用户名找到用户，请记住使用 `accounts-password` 提供的区分大小写的查找函数。要了解更多请阅读[区分大小写的章节](#case-sensitivity)。
 
 <h2 id="custom-user-data">自定义用户数据</h2>
 
-As your app gets more complex, you will invariably need to store some data about individual users, and the most natural place to put that data is in additional fields on the `Meteor.users` collection described above. In a more normalized data situation it would be a good idea to keep Meteor's user data and yours in two separate tables, but since MongoDB doesn't deal well with data associations it makes sense to just use one collection.
+当你的应用越来越复杂的时候，不可避免的需要存储单个用户的数据，最理想的存储位置就是上面所讲到的 `Meteor.users` 的其中一个域。如果要让数据更标准，最好是将 Meteor 的用户数据和应用的数据分别放在不同的表，但是因为 MongoDB 不支持表格关联，所以只能使用一个表。
 
 <h3 id="top-level-fields">添加顶级域到用户文件</h3>
 
-The best way to store your custom data onto the `Meteor.users` collection is to add a new uniquely-named top-level field on the user document. For example, if you wanted to add a mailing address to a user, you could do it like this:
+将自定义的数据存储到 `Meteor.users` 最好的办法就是在用户文件中添加一个新的顶级域，如果要给用户添加一个电子邮件地址，可以这样做：
 
 ```js
 // 使用 schema.org 提供的地址结构
@@ -646,24 +646,24 @@ Meteor.publish('Meteor.users.initials', function ({ userIds }) {
 
 <h2 id="roles-and-permissions">角色和权限</h2>
 
-One of the main reasons you might want to add a login system to your app is to have permissions for your data. For example, if you were running a forum, you would want administrators or moderators to be able to delete any post, but normal users can only delete their own. This uncovers two different types of permissions:
+在应用中添加登录系统的一个主要原因就是设置获取数据的权限。例如，如果你运营一个论坛，那么可能需要有管理员或主席的权限让你可以删除其他人的发布，但通常情况下用户只可以删除自己的发布。这里涉及到两种不同的权限：
 
 1. 角色权限
 2. 单个文件权限
 
 <h3 id="alanning-roles">alanning:roles</h3>
 
-The most popular package for role-based permissions in Meteor is [`alanning:roles`](https://atmospherejs.com/alanning/roles). For example, here is how you would make a user into an administrator, or a moderator:
+Meteor 最热门的角色分配权限包是[`alanning:roles`](https://atmospherejs.com/alanning/roles)。下面是如何赋予一个用户管理员或主席权限的例子：
 
 ```js
-// Give Alice the 'admin' role
+//赋予 Alice 管理员的角色 
 Roles.addUsersToRoles(aliceUserId, 'admin', Roles.GLOBAL_GROUP);
 
-// Give Bob the 'moderator' role for a particular category
+// 赋予 Bob 在特定类别的主席角色
 Roles.addUsersToRoles(bobsUserId, 'moderator', categoryId);
 ```
 
-Now, let's say you wanted to check if someone was allowed to delete a particular forum post:
+现在可以判断某一用户是否有权限删除特定的论坛信息：
 
 ```js
 const forumPost = Posts.findOne(postId);
@@ -679,13 +679,13 @@ if (! canDelete) {
 Posts.remove(postId);
 ```
 
-Note that we can check for multiple roles at once, and if someone has a role in the `GLOBAL_GROUP`, they are considered as having that role in every group. In this case, the groups were by category ID, but you could use any unique identifier to make a group.
+注意到现在我们可以同时判断多个角色，如果用户是 `GLOBAL_GROUP` 中的一员，那么该用户就拥有所有组的权限。在这个例子中，组是通过类别 ID 识别的，但你可以使用任何唯一的标识符划分组。
 
-Read more in the [`alanning:roles` package documentation](https://atmospherejs.com/alanning/roles).
+阅读[`alanning:roles` 文档](https://atmospherejs.com/alanning/roles)了解更多。
 
-<h3 id="per-document-permissions">Per-document permissions</h3>
+<h3 id="per-document-permissions">单个文件权限</h3>
 
-Sometimes, it doesn't make sense to abstract permissions into "groups" - you just want documents to have owners and that's it. In this case, you can use a simpler strategy using collection helpers.
+有的时候，将权限划分到组并不合理 —— 可能只需要确保文件所有者对文件有操作功能就好了。在这种情况下，我们使用数据集 helper 就可以解决了。
 
 ```js
 Lists.helpers({
