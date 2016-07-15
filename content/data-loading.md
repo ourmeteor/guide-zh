@@ -1,24 +1,24 @@
 ---
-title: Publications and Data Loading
+title: 发布和数据加载
 order: 11
-description: How and where to load data in your Meteor app using publications and subscriptions.
+description: Meteor 应用如何使用发布和订阅加载数据，以及在哪里加载数据
 discourseTopicId: 19661
 ---
 
-After reading this guide, you'll know:
+阅读完本文，你将能够：
 
-1. What publications and subscriptions are in the Meteor platform.
-2. How to define a publication on the server.
-3. Where to subscribe on the client and in which templates.
-4. Useful patterns for managing subscriptions.
-5. How to reactively publish related data.
-6. How to ensure your publication is secure in the face of reactive changes.
-7. How to use the low-level publish API to publish anything.
-8. What happens when you subscribe to a publication.
-8. How to turn a 3rd-party REST endpoint into a publication.
-10. How to turn a publication in your app into a REST endpoint.
+1. Meteor 平台中订阅和发布指的是什么。
+2. 如何在服务器端定义一个发布。
+3. 客户端如何订阅数据，以及使用哪个模板。
+4. 订阅管理的有效模式
+5. 如何响应式发布相关数据。
+6. 如何在响应式改变中确保发布是安全的。
+7. 如何使用低级发布 API  接口发布信息。
+8. 当订阅一个发布的时候会发生什么。
+8. 如何将第三方 REST 端点转换为一个发布。
+10. 如何将你应用中的一个发布转换为 一个 REST 端点。
 
-<h2 id="publications-and-subscriptions">Publications and subscriptions</h2>
+<h2 id="publications-and-subscriptions">发布和订阅</h2>
 
 In a traditional, HTTP-based web application, the client and server communicate in a "request-response" fashion. Typically the client makes RESTful HTTP requests to the server and receives HTML or JSON data in response, and there's no way for the server to "push" data to the client when changes happen at the backend.
 
