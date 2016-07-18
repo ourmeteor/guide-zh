@@ -94,15 +94,15 @@ Meteor.subscribe('todos.inList', list._id);
 
 <h3 id="organization-publications">组织一个发布</h3>
 
-It makes sense to place a publication alongside the feature that it's targeted for. For instance, sometimes publications provide very specific data that's only really useful for the view for which they were developed. In that case, placing the publication in the same module or directory as the view code makes perfect sense.
+把发布跟功能模块放在一起是有道理的。例如，有的时候发布提供了非常具体的数据，但这些数据只对所在的开发视图有用。在这个例子中，把发布跟视图代码放在同一个模块或目录下非常有意义。
 
-Often, however, a publication is more general. For example in the Todos example application, we create a `todos.inList` publication, which publishes all the todos in a list. Although in the application we only use this in one place (in the `Lists_show` template), in a larger app, there's a good chance we might need to access all the todos for a list in other places. So putting the publication in the `todos` package is a sensible approach.
+通常情况下发布应该更常见。在 Todos 应用中，我们创建了一个名为 `todos.inList` 的发布，用于发布列表中的所有 todos。尽管在应用中我们只在一个地方使用该发布（在 `Lists_show` 模板），在一个大型的应用，有很大可能我们需要在不同的地方获取列表中的所有 todos。所以把发布放在一个 `todos` 包是明智的做法。
 
 <h2 id="subscriptions">订阅数据</h2>
 
-To use publications, you need to create a subscription to it on the client. To do so, you call `Meteor.subscribe()` with the name of the publication. When you do this, it opens up a subscription to that publication, and the server starts sending data down the wire to ensure that your client collections contain up to date copies of the data specified by the publication.
+要使用发布，需要在客户端创建对应的订阅。也即调用 `Meteor.subscribe()` 和发布的名字。当这样做的时候，会打开对该发布的订阅，然后服务器开始发送数据，确保客户端 “缓存” 数据集包含最新的发布数据。
 
-`Meteor.subscribe()` also returns a "subscription handle" with a property called `.ready()`. This is a reactive function that returns `true` when the publication is marked ready (either you call `this.ready()` explicitly, or the initial contents of a returned cursor are sent over).
+`Meteor.subscribe()` 同时返回一个带有 `.ready()` 属性的 "subscription handle"。这是一个响应函数，当发布被标记为 "ready" 时（无论是你明确调用 `this.ready()` 函数，还是 cursor 的初始内容已被发送）会返回 `true`。
 
 ```js
 const handle = Meteor.subscribe('lists.public');
@@ -110,15 +110,15 @@ const handle = Meteor.subscribe('lists.public');
 
 <h3 id="stopping-subscriptions">停止订阅</h3>
 
-The subscription handle also has another important property, the `.stop()` method. When you are subscribing, it is very important to ensure that you always call `.stop()` on the subscription when you are done with it. This ensures that the documents sent by the subscription are cleared from your local Minimongo cache and the server stops doing the work required to service your subscription. If you forget to call stop, you'll consume unnecessary resources both on the client and the server.
+订阅处理器还有另外一个重要的属性，就是 `.stop` 方法。当执行订阅的时候，订阅完成后要记住调用 `.stop()`。这可以确保通过订阅发送的文件从本地 Minimongo 缓存清除，服务器也会停止对该订阅的响应。如果忘记调用停止函数，会在客户端和服务器端消耗不必要的资源。
 
-*However*, if you call `Meteor.subscribe()` conditionally inside a reactive context (such as an `autorun`, or `getMeteorData` in React) or via `this.subscribe()` in a Blaze component, then Meteor's reactive system will automatically call `this.stop()` for you at the appropriate time.
+*但是*，当在响应环境（）中调用 `Meteor.subscribe()` 或者在 Blaze 组件中使用 `this.subscribe()`，Meteor 响应系统会根据情况自动调用 `this.stop()`。
 
 <h3 id="organizing-subscriptions">UI 组件中的订阅</h3>
 
-It is best to place the subscription as close as possible to the place where the data from the subscription is needed. This reduces "action at a distance" and makes it easier to understand the flow of data through your application. If the subscription and fetch are separated, then it's not always clear how and why changes to the subscriptions (such as changing arguments), will affect the contents of the cursor.
+最好是将订阅代码尽可能跟需要这些订阅数据的模块放在一起。这可以降低 “超距作用” 和使得应用的数据流动更清晰。如果订阅和获取数据是分开的，那么当订阅改变时（例如改变函数），我们对于 cursor 内容会随着改变的认识可能不会那么清晰。
 
-What this means in practice is that you should place your subscription calls in *components*. In Blaze, it's best to do this in the `onCreated()` callback:
+在实践中这意味着你需要将订阅的调用代码放在 *components*。在 Blaze 组件中最好在 `onCreated()` 回调中调用订阅函数：
 
 ```js
 Template.Lists_show_page.onCreated(function() {
@@ -130,17 +130,17 @@ Template.Lists_show_page.onCreated(function() {
 });
 ```
 
-In this code snippet we can see two important techniques for subscribing in Blaze templates:
+在这个代码片段中我们可以看到 Blaze 模板中调用订阅函数的两个技巧：
 
-1. Calling `this.subscribe()` (rather than `Meteor.subscribe`), which attaches a special `subscriptionsReady()` function to the template instance, which is true when all subscriptions made inside this template are ready.
+1. 调用 `this.subscribe()` (而不是 `Meteor.subscribe`)，该函数附加一个特殊的 `subscriptionsReady()` 函数到模板实例，当模板中的订阅都准备好的时候 `subscriptionsReady()` 的值是 true。
 
-2. Calling `this.autorun` sets up a reactive context which will re-initialize the subscription whenever the reactive function `this.getListId()` changes.
+2. 调用 `this.autorun` 设置一个响应式背景，当响应式函数 `this.getListedId()` 函数改变的时候可以重新初始化订阅。
 
-Read more about Blaze subscriptions in the [Blaze article](blaze.html#subscribing), and about tracking loading state inside UI components in the [UI article](ui-ux.html#subscription-readiness).
+了解更多关于 Blaze 订阅的内容请阅读[Blaze 章节](blaze.html#subscribing)，了解更多关于跟踪 UI 组件中加载状态的请阅读[UI 章节](ui-ux.html#subscription-readiness)。
 
 <h3 id="fetching">获取数据</h3>
 
-Subscribing to data puts it in your client-side collection. To use the data in your user interface, you need to query your client-side collection. There are a couple of important rules to follow when doing this.
+订阅数据并放在客户端数据集。要在用户界面使用数据，需要查询客户端的数据集。查询数据时有几点需要注意。
 
 <h4 id="specific-queries">总是使用特定查询获取数据</h4>
 
@@ -182,7 +182,7 @@ Tracker.autorun(() => {
 });
 ```
 
-We can use this information to be more subtle about when we try and show data to users, and when we show a loading screen.
+当我们尝试展示数据给用户或者展示一个加载中的画面，我们可以使用这些信息。
 
 <h3 id="changing-arguments">响应式变更订阅参数</h3>
 
