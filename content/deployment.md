@@ -53,7 +53,7 @@ discourseTopicId: 19668
 
 <h3 id="domain-name">域名</h3>
 
-用户通过什么 URL 访问你的网站？你可能需要向域名注册商注册一个域名，并设置 DNS 指向特定网站 (这要看你如何部署，请看下文)。如果你在 Galaxy 部署，在测试应用的时候可以使用 `x.meteorapp.com` 域名。
+用户通过什么 URL 访问你的网站？你可能需要向域名注册商注册一个域名，并设置 DNS 指向特定网站 （这要看你如何部署，请看下文）。如果你在 Galaxy 部署，在测试应用的时候可以使用 `x.meteorapp.com` 域名。
 
 <h3 id="ssl">SSL 认证</h3>
 
@@ -61,7 +61,7 @@ discourseTopicId: 19668
 
 <h3 id="cdn">CDN</h3>
 
-虽然不是严格要求，但为你的网站建立内容分布网络 (CDN) 会是一个好主意。CDN 是托管网站静态资产 (如 JavaScript, CSS, 和 images) 的服务器网络，它分布在世界上各个地方，并使用最靠近用户的服务器为用户提供这些静态资产，目的是加速访问速度。例如，如果网站的服务器在 USA 的东海岸，而你的用户在澳大利亚，CDN 可以在澳大利亚，甚至在用户所在的城市托管一份该网站 JavaScript 的副本。这将极大缩短网站的初始加载时间。
+虽然不是严格要求，但为你的网站建立内容分布网络 (CDN) 会是一个好主意。CDN 是托管网站静态资产 （如 JavaScript, CSS, 和图片) 的服务器网络，它分布在世界上各个地方，并使用最靠近用户的服务器为用户提供这些静态资产，目的是加速访问速度。例如，如果网站的服务器在 USA 的东海岸，而你的用户在澳大利亚，CDN 可以在澳大利亚，甚至在用户所在的城市托管一份该网站 JavaScript 的副本。这将极大缩短网站的初始加载时间。
 
 CDN 最基本的语法就是把文件上传到 CDN 并改变 URL 指向 CDN (例如你的 Meteor 应用位于 `http://myapp.com`，则将图片的 URL 从 `<img src="http://myapp.com/cats.gif">` 改为 `<img src="http://mycdn.com/cats.gif">`). 但是这对于 Meteor 来说有点困难，因为最大的文件夹 —— Javascript 组件会因为你更改应用而经常改变。
 
@@ -91,7 +91,7 @@ Template.registerHelper("assetUrl", (asset) => {
 
 <h4 id="cdn-webfonts">CDNs 和 webfonts</h4>
 
-如果你的应用中包含网络字体并通过CDN获取，您可能需要配置字体的 header，以允许跨域资源共享 (因为网络字体来自于你的网站之外的其他地方)。在 Meteor 可以通过添加一个 handler 轻松做到 (你必须确保 CDN 遍历 header):
+如果你的应用中包含网络字体并通过CDN获取，您可能需要配置字体的 header，以允许跨域资源共享（因为网络字体来自于你的网站之外的其他地方)。在 Meteor 可以通过添加一个 handler 轻松做到 (你必须确保 CDN 遍历 header):
 
 ```js
 import { WebApp } from 'meteor/webapp';
@@ -110,9 +110,9 @@ WebApp.rawConnectHandlers.use(function(req, res, next) {
 - Behavior 选项
 - 选择应用原型
 - 编辑按钮
-- 在 "Whitelist Headers" 下拉选择 "Origin"
+- 在 『Whitelist Headers』 下拉选择 『Origin』
 - 添加按钮
-- "Yes, Edit"按钮
+- 『Yes, Edit』按钮
 
 <h2 id="deployment-options">部署选项</h2>
 
@@ -126,13 +126,13 @@ Galaxy 是在 Amazon AWS 上运行的分布式系统。如果你了解 Galaxy �
 
 如果要在 Galaxy 上部署，需要[注册一个账号](https://www.meteor.com/galaxy/signup),并分开提供 MongoDB 数据库 (参考下文)。
 
-注册好账号后，[部署到 Galaxy](http://galaxy-guide.meteor.com/deploy-guide.html)就很简单了。只需要[在设置文件中添加环境变量](http://galaxy-guide.meteor.com/environment-variables.html)指向你的 MongoDB, 然后就可以根据下面的命令部署了：
+注册好账号后，[部署到 Galaxy ](http://galaxy-guide.meteor.com/deploy-guide.html)就很简单了。只需要[在设置文件中添加环境变量](http://galaxy-guide.meteor.com/environment-variables.html)指向你的 MongoDB, 然后就可以根据下面的命令部署了：
 
 ```bash
 DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy your-app.com --settings production-settings.json
 ```
 
-为了让 你的域名 (在这个例子中是 `your-app.com`) 在 Galaxy 也可以工作，你需要[设置 DNS 指向 Galaxy](http://galaxy-guide.meteor.com/dns.html)。完成之后，就应该可以通过浏览器访问你的网站。
+为了让你的域名(在这个例子中是 `your-app.com`) 在 Galaxy 也可以工作，你需要[设置 DNS 指向 Galaxy](http://galaxy-guide.meteor.com/dns.html)。完成之后，就应该可以通过浏览器访问你的网站。
 
 你也可以通过 https://galaxy.meteor.com 进入 Galaxy UI,在 Galaxy UI 可以管理你的应用，监控连接数和资源使用，查看日志，更改设置。
 
@@ -140,7 +140,7 @@ DEPLOY_HOSTNAME=us-east-1.galaxy-deploy.meteor.com meteor deploy your-app.com --
 
 如果你根据[我们的建议](security.html#ssl)，你可能会想要在 Galaxy 应用上通过域名的证书和密钥[设置 SSL](http://galaxy-guide.meteor.com/encryption.html)。这里的关键点是添加 `force-ssl` 包，并通过 Galaxy UI 添加 SSL 证书。
 
-一旦设置好 Galaxy, 部署就很简单了 (重新运行上面的 `meteor deploy` 命令)，监控就更简单了 —— 登入 galaxy.meteor.com, 在那里就可以监控。
+一旦设置好 Galaxy, 部署就很简单了(重新运行上面的 `meteor deploy` 命令)，监控就更简单了 —— 登入 galaxy.meteor.com, 在那里就可以监控。
 
 <img src="images/galaxy-scaling.png">
 
