@@ -198,40 +198,40 @@ Template.Lists_show_page.onCreated(function() {
 });
 ```
 
-In our example, the `autorun` will re-run whenever `this.getListId()` changes, (ultimately because `FlowRouter.getParam('_id')` changes), although other common reactive data sources are:在这个例子中，当 `this.getListId()` 改变时 `autorun` 都会重新运行，（其实是因为 `FlowRouter.getParam('_id')` 改变了），其他常见的响应式数据源有：
+在这个例子中，当 `this.getListId()` 改变时 `autorun` 都会重新运行，（其实是因为 `FlowRouter.getParam('_id')` 改变了），其他常见的响应式数据源有：
 
 1. 模板的数据背景（可以通过 `Template.currentData()` 响应式获取）。
 2. 当前用户状态（`Meteor.user()` 和 `Meteor.loggingIn()`）。
 3. 其他针对应用的客户端数据存储内容。
 
-Technically, what happens when one of these reactive sources changes is the following:
+技术上来说，当这些响应式数据源其中一项改变时，会有以下变化：
 
-1. The reactive data source *invalidates* the autorun computation (marks it so that it re-runs in the next Tracker flush cycle).
-2. The subscription detects this, and given that anything is possible in next computation run, marks itself for destruction.
-3. The computation re-runs, with `.subscribe()` being re-called either with the same or different arguments.
-4. If the subscription is run with the *same arguments* then the "new" subscription discovers the old "marked for destruction" subscription that's sitting around, with the same data already ready, and simply reuses that.
-5. If the subscription is run with *different arguments*, then a new subscription is created, which connects to the publication on the server.
-6. At the end of the flush cycle (i.e. after the computation is done re-running), the old subscription checks to see if it was re-used, and if not, sends a message to the server to tell the server to shut it down.
+1. 响应式数据源使得 autorun *失效*（给它做一个标记在下一个跟踪器冲洗周期重新运行）。
+2. 订阅检测到以上变化时，下一个计算运行后可以有多种结果，因此订阅把自己标记为可重构的。
+3. 计算重新运行，重新调用 `.subscibe()`，可以带相同或不同的参数。
+4. 如果订阅运行使用 *相同的参数*，那么 “新” 的订阅会发现之前 “把自己标记为可重构” 的订阅，相同的数据已经准备好了，拿来用就可以。
+5. 如果订阅运行使用 *不同的参数*，会生成一个新的订阅，链接到服务器端的发布。
+6. 在冲洗周期结束后（例如重新计算结束后），旧的订阅会检测自己是否有被重新使用，没有的话发送信息关闭该订阅的信息到服务器。
 
-Step 4 above is an important detail---that the system cleverly knows not to re-subscribe if the autorun re-runs and subscribes with the exact same arguments. This holds true even if the new subscription is set up somewhere else in the template hierarchy. For example, if a user navigates between two pages that both subscribe to the exact same subscription, the same mechanism will kick in and no unnecessary subscribing will happen.
+上面的步骤 4 是一个重要的细节 —— 系统清楚地知道如果参数相同的话不需要重新订阅。这对模板结构中其他新订阅来说也是一样的。例如，如果用户在两个有相同订阅的页面之间切换，相同的机制将会发生，因此没有必要重新订阅。
 
 <h3 id="publication-behavior-with-arguments">参数改变后的发布行为</h3>
 
-It's also worth knowing a little about what happens on the server when the new subscription is started and the old one is stopped.
+当开始新的订阅和停止旧的订阅时服务器上发生了什么，这也是很值得了解的。
 
-The server *explicitly* waits until all the data is sent down (the new subscription is ready) for the new subscription before removing the data from the old subscription. The idea here is to avoid flicker---you can, if desired, continue to show the old subscription's data until the new data is ready, then instantly switch over to the new subscription's complete data set.
+服务器 *明确地* 等到所有数据都被发送（新的订阅准备好了）之后再从旧的订阅中删除数据。目的是防止闪烁 —— 当然你可以一直显示旧的订阅获取的数据直到新的数据准备好，然后立即切换到新订阅的完整数据集。
 
-What this means is in general, when changing subscriptions, there'll be a period where you are *over-subscribed* and there is more data on the client than you strictly asked for. This is one very important reason why you should always fetch the same data that you have subscribed to (don't "over-fetch").
+想说明的是，通常情况下，当改变订阅的时候，有一段时间会 *过度获取* 数据，客户端的数据比我们查询的多。这也是为什么我们应该获取和订阅相同的数据（而不是 “过度获取”）。
 
 <h3 id="pagination">订阅分页</h3>
 
-A very common pattern of data access is pagination. This refers to the practice of fetching an ordered list of data one "page" at a time---typically some number of items, say twenty.
+一个非常常见的数据访问方式是分页。这指的是在一个页面获取有序列表的数据 —— 通常是一定数量的物品，假设 20 件。
 
 There are two styles of pagination that are commonly used, a "page-by-page" style---where you show only one page of results at a time, starting at some offset (which the user can control), and "infinite-scroll" style, where you show an increasing number of pages of items, as the user moves through the list (this is the typical "feed" style user interface).
 
 In this section, we'll consider a publication/subscription technique for the second, infinite-scroll style pagination. The page-by-page technique is a little tricker to handle in Meteor, due to it being difficult to calculate the offset on the client. If you need to do so, you can follow many of the same techniques that we use here and use the [`percolate:find-from-publication`](https://atmospherejs.com/percolate/find-from-publication) package to keep track of which records have come from your publication.
 
-In an infinite scroll publication, we simply need to add a new argument to our publication controlling how many items to load. Suppose we wanted to paginate the todo items in our Todos example app:
+在一个可以无限滚动下拉的页面，我们只需要简单在订阅中添加一个新参数控制加载的物品数量。例如我们要在 Todos 应用中实现分页。
 
 ```js
 const MAX_TODOS = 1000;
