@@ -1,51 +1,51 @@
 ---
-title: "Security"
+title: "安全性"
 order: 40
-description: How to secure your Meteor app.
+description: 如何保证 Meteor 应用的安全性.
 discourseTopicId: 19667
 ---
 
-After reading this guide, you'll know:
+阅读完本文，你将能够：
 
-1. The security surface area of a Meteor app.
-2. How to secure Meteor Methods, publications, and source code.
-3. Where to store secret keys in development and production.
-4. How to follow a security checklist when auditing your app.
+1. Meteor 应用的安全。
+2. 如何保证 Meteor 方法，发布和源码的安全性。
+3. 在部署和生产中往哪里存储密钥。
+4. 如何按照一个安全性检查表来审核应用。
 
-<h1 id="introduction">Introduction</h1>
+<h1 id="introduction">简介</h1>
 
-Securing a web application is all about understanding security domains and understanding the attack surface between these domains. In a Meteor app, things are pretty simple:
+Securing a web application is all about understanding security domains and understanding the attack surface between these domains. In a Meteor app, things are pretty simple:保证一个应用的安全就是理解安全域和安全域之间的攻击界面。在一个 Meteor 应用中，其实很简单：
 
-1. Code that runs on the server can be trusted.
-2. Everything else: code that runs on the client, data sent through Method and publication arguments, etc, can't be trusted.
+1. 服务器上运行的代码可以被信任。
+2. 其他：客户端上运行的代码，通过 Method 和 publication 参数传输的数据等，都是不能被信任的。
 
-In practice, this means that you should do most of your security and validation on the boundary between these two domains. In simple terms:
+实际应用中，应该在这两个域之间的边界做大量的安全性和验证性的工作。简单来说：
 
-1. Validate and check all inputs that come from the client.
-2. Don't leak any secret information to the client.
+1. 验证和检验所有来自客户端的输入。
+2. 不要把任何私密信息泄露到客户端。
 
-<h2 id="attack-surface">Concept: Attack surface</h2>
+<h2 id="attack-surface">概念：攻击界面</h2>
 
-Since Meteor apps are often written in a style that puts client and server code together, it's extra important to be aware what is running on the client, what is running on the server, and what the boundaries are. Here's a complete list of places security checks need to be done in a Meteor app:
+大部分 Meteor 应用都是把客户端代码文件和服务器端代码文件放在一起，所以应该格外注意哪些是在客户端运行的，哪些是在服务器端运行的，两种的界限是什么。下面是 Meteor 应用安全性检查的完整列表：
 
-1. **Methods**: Any data that comes in through Method arguments needs to be validated, and Methods should not return data the user shouldn't have access to.
-2. **Publications**: Any data that comes in through publication arguments needs to be validated, and publications should not return data the user shouldn't have access to.
-3. **Served files**: You should make sure none of the source code or configuration files served to the client have secret data.
+1. **Methods**: 任何以 Method 参数带进来的数据都应该被验证有效性， Method 也不应该返回用户没有权限获得的数据。
+2. **Publications**: 任何以 publication 参数带进来的数据都应该被验证有效性，publication 也不应该返回用户没有权限获得的数据。
+3. **Served files**: 应该确保运行在客户端的源码或配置文件不能包含私密数据。
 
-Each of these points will have their own section below.
+上面讲到的这些点我们下面会详细讲解：
 
-<h3 id="allow-deny">Avoid allow/deny</h3>
+<h3 id="allow-deny">避免使用 allow/deny</h3>
 
-In this guide, we're going to take a strong position that using [allow](http://docs.meteor.com/#/full/allow) or [deny](http://docs.meteor.com/#/full/deny) to run MongoDB queries directly from the client is not a good idea. The main reason is that it is hard to follow the principles outlined above. It's extremely difficult to validate the complete space of possible MongoDB operators, which could potentially grow over time with new versions of MongoDB.
+在这个教程中，我们非常不支持直接在客户端使用 [allow](http://docs.meteor.com/#/full/allow) 和 [deny](http://docs.meteor.com/#/full/deny) 查询 MongoDB 的数据。原因在上面的安全性完整列表。验证所有 MongoDB 数据库查询是非常困难的，随着 MongoDB 版本的更新，遇到的困难可能会更多。
 
-There have been several articles about the potential pitfalls of accepting MongoDB update operators from the client, in particular the [Allow & Deny Security Challenge](https://www.discovermeteor.com/blog/allow-deny-security-challenge/) and its [results](https://www.discovermeteor.com/blog/allow-deny-challenge-results/), both on the Discover Meteor blog.
+有好几篇文章讲到在客户端执行 MongoDB 数据库更新的潜在缺陷，特别是 [Allow & Deny 安全性挑战](https://www.discovermeteor.com/blog/allow-deny-security-challenge/) 和它的 [results](https://www.discovermeteor.com/blog/allow-deny-challenge-results/)，可以在 Discover Meteor 博客上找到。
 
-Given the points above, we recommend that all Meteor apps should use Methods to accept data input from the client, and restrict the arguments accepted by each Method as tightly as possible.
+按照上面讲到的，我们推荐所有的 Meteor 应用都应该使用 Method 操作来自客户端的数据，并严格限制每个 Method 的参数。
 
-Here's a code snippet to add to your server code which disables client-side updates on a collection. This will make sure no other part of your app can use `allow`:
+下面的代码片段放在服务器端拒绝所有客户端对数据集的更新。这可以保证应用中也不可以使用 `allow`：
 
 ```js
-// Deny all client-side updates on the Lists collection
+// 拒绝所有客户端对数据集的更新
 Lists.deny({
   insert() { return true; },
   update() { return true; },
@@ -56,15 +56,15 @@ Lists.deny({
 
 <h2 id="methods">Methods</h2>
 
-Methods are the way your Meteor server accepts inputs and data from the outside world, so it's natural that they are the most important topic for security. If you don't properly secure your Methods, users can end up modifying your database in unexpected ways - editing other people's documents, deleting data, or messing up your database schema causing the app to crash.
+Method 是 Meteor 应用从外部接收输入和数据的方式，所以从应用安全性来讲是非常重要的。如果没有保证 Method 的安全性，用户可能会通过你不希望的方式修改数据库——修改其他用户的文件，删除数据，或者搞乱数据库进而搞垮你的应用。
 
-<h3 id="validate-arguments">Validate all arguments</h3>
+<h3 id="validate-arguments">验证所有的参数</h3>
 
-It's much easier to write clean code if you can assume your inputs are correct, so it's valuable to validate all Method arguments before running any actual business logic. You don't want someone to pass a data type you aren't expecting and cause unexpected behavior.
+如果输入是正确的，那么写简洁欸的代码就会更容易，所有在运行任何代码前验证所有 Method 的参数是很重要的。你不会希望用户输入不正确的数据类型进而导致程序崩溃。
 
-Consider that if you are writing unit tests for your Methods, you would need to test all possible kinds of input to the Method; validating the arguments restricts the space of inputs you need to unit test, reducing the amount of code you need to write overall. It also has the extra bonus of being self-documenting; someone else can come along and read the code to find out what kinds of parameters a Method is looking for.
+假设你正在写 Method 的单元测试，你需要检查所有可能的 Method 数据输入；验证参数可以把需要做单元测试的输入限定在一个范围内，减少代码量。自我记录也是很好的一个习惯；其他开发者可以通过查看你的代码了解 Method 所要求的参数类型。
 
-Just as an example, here's a situation where not checking arguments can be disastrous:
+下面这个例子可以说明不验证参数的话，可能会带来灾难性后果：
 
 ```js
 Meteor.methods({
@@ -78,27 +78,27 @@ Meteor.methods({
 });
 ```
 
-If someone comes along and passes a non-ID selector like `{}`, they will end up deleting the entire collection.
+如果用户传递一个非 ID 的选择器，如 `{}`，则整个数据库都会被删除。
 
 <h3 id="validated-method">mdg:validated-method</h3>
 
-To help you write good Methods that exhaustively validate their arguments, we've written a simple wrapper package for Methods that enforces argument validation. Read more about how to use it in the [Methods article](methods.html#validated-method). The rest of the code samples in this article will assume that you are using this package. If you aren't, you can still apply the same principles but the code will look a little different.
+为了帮助你写成全面验证参数的 Method，我们给 Method 写了一个闭包来强制要求参数验证。在[Methods 章节](methods.html#validated-method)了解如何使用。接下来我们写的代码都是在安装了这个包的基础上。如果没有，这些原则也适用只是写出来的代码会有点怪。
 
-<h3 id="user-id-client">Don't pass userId from the client</h3>
+<h3 id="user-id-client">不要从客户端传递 userId</h3>
 
-The `this` context inside every Meteor Method has some useful information about the current connection, and the most useful is [`this.userId`](http://docs.meteor.com/#/full/method_userId). This property is managed by the DDP login system, and is guaranteed by the framework itself to be secure following widely-used best practices.
+Meteor Method 的 `this` 语境可以包含一些当前连接的有用信息，最有用的是[`this.userId`](http://docs.meteor.com/#/full/method_userId)。这个属性是 DDP 登录系统在管理，由框架本身保证其安全性。
 
-Given that the user ID of the current user is available through this context, you should never pass the ID of the current user as an argument to a Method. This would allow any client of your app to pass any user ID they want. Let's look at an example:
+当前用户的用户 ID 可以根据 `this` 获取，所以不应该将当前用户的 ID 作为参数传递给 Method。因为这将使得任何客户端可以传递任何用户 ID。我们看下面这个例子：
 
 ```js
-// #1: Bad! The client could pass any user ID and set someone else's name
+// #1: 错误！客户端可以传递任何用户的 ID 并更改其姓名。
 setName({ userId, newName }) {
   Meteor.users.update(userId, {
     $set: { name: newName }
   });
 }
 
-// #2: Good, the client can only set the name on the currently logged in user
+// #2: 正确，客户端只可以设置当前登录用户的名字。
 setName({ newName }) {
   Meteor.users.update(this.userId, {
     $set: { name: newName }
@@ -106,12 +106,12 @@ setName({ newName }) {
 }
 ```
 
-The _only_ times you should be passing any user ID as an argument are the following:
+需要传递任何用户 ID 作为参数的只有下面几种情况：
 
 1. This is a Method only accessible by admin users, who are allowed to edit other users. See the section about [user roles](accounts.html##roles-and-permissions) to learn how to check that a user is in a certain role.
 2. This Method doesn't modify the other user, but uses it as a target; for example, it could be a Method for sending a private message, or adding a user as a friend.
 
-<h3 id="specific-action">One Method per action</h3>
+<h3 id="specific-action">每个行为用一个 Method</h3>
 
 The best way to make your app secure is to understand all of the possible inputs that could come from an untrusted source, and make sure that they are all handled correctly. The easiest way to understand what inputs can come from the client is to restrict them to as small of a space as possible. This means your Methods should all be specific actions, and shouldn't take a multitude of options that change the behavior in significant ways. The end goal is that you can easily look at each Method in your app and validate or test that it is secure. Here's a secure example Method from the Todos example app:
 
@@ -164,7 +164,7 @@ const Meteor.users.methods.setUserData = new ValidatedMethod({
 
 The above Method is great because you can have the flexibility of having some optional fields and only passing the ones you want to change. In particular, what makes it possible for this Method is that the security considerations of setting one's full name and date of birth are the same - we don't have to do different security checks for different fields being set. Note that it's very important that the `$set` query on MongoDB is generated on the server - we should never take MongoDB operators as-is from the client, since they are hard to validate and could result in unexpected side effects.
 
-<h4 id="reusing-security-rules">Refactoring to reuse security rules</h4>
+<h4 id="reusing-security-rules">重构以重新使用安全性规则</h4>
 
 You might run into a situation where many Methods in your app have the same security checks. This can be simplified by factoring out the security into a separate module, wrapping the Method body, or extending the `Mongo.Collection` class to do security inside the `insert`, `update`, and `remove` implementations on the server. However, implementing your client-server communication via specific Methods is still a good idea rather than sending arbitrary `update` operators from the client, since a malicious client can't send an `update` operator that you didn't test for.
 
