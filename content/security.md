@@ -108,12 +108,12 @@ setName({ newName }) {
 
 需要传递任何用户 ID 作为参数的只有下面几种情况：
 
-1. This is a Method only accessible by admin users, who are allowed to edit other users. See the section about [user roles](accounts.html##roles-and-permissions) to learn how to check that a user is in a certain role.
-2. This Method doesn't modify the other user, but uses it as a target; for example, it could be a Method for sending a private message, or adding a user as a friend.
+1. 只有管理员才可以接触到的 Method，用于编辑其他用户资料。请查看[用户角色](accounts.html##roles-and-permissions)章节了解如何判断用户的角色和权限。
+2. 不用于修改其他用户的 Method，而是作为目标；例如，该 Methood 可以用于发送私信，或者添加其他用户为好友。
 
 <h3 id="specific-action">每个行为用一个 Method</h3>
 
-The best way to make your app secure is to understand all of the possible inputs that could come from an untrusted source, and make sure that they are all handled correctly. The easiest way to understand what inputs can come from the client is to restrict them to as small of a space as possible. This means your Methods should all be specific actions, and shouldn't take a multitude of options that change the behavior in significant ways. The end goal is that you can easily look at each Method in your app and validate or test that it is secure. Here's a secure example Method from the Todos example app:
+确保应用安全最好的办法就是理解所有的输入都可能来自不安全的渠道，所以要处理好这些输入。要了解什么样的输入可以来自客户端的最简单的方法就是将其限制在尽可能小的空间中。这意味着应用中的 Method 应该都是有具体行为的，而且不应该有多种选择可以改变这种行为。这样做的目标就是我们可以简单查看应用中的 Method 并且验证和测试它来确保安全性。下面是 Todos 应用中一个安全的 Method：
 
 ```js
 export const makePrivate = new ValidatedMethod({
@@ -143,9 +143,9 @@ export const makePrivate = new ValidatedMethod({
 });
 ```
 
-You can see that this Method does a _very specific thing_ - it just makes a single list private. An alternative would have been to have a Method called `setPrivacy`, which could set the list to private or public, but it turns out that in this particular app the security considerations for the two related operations - `makePrivate` and `makePublic` - are very different. By splitting our operations into different Methods, we make each one much clearer. It's obvious from the above Method definition which arguments we accept, what security checks we perform, and what operations we do on the database.
+你可以看到这个 Method 在做一件很具体的事——将单个列表标记为私有。还可以使用另外一个 Method `setPrivacy`，也可以设置列表为公开或私有，但是在这个应用中对于 `makePrivate` 和 `makePublic` 的安全性考虑是很不同的。通过将操作分为不同的 Method，会更加简单清楚。从上面 Method 的定义可以清楚知道我们接受的参数，如何检测安全性，以及对于数据库的操作。
 
-However, this doesn't mean you can't have any flexibility in your Methods. Let's look at an example:
+但是，这并不是 Method 的灵活性很差。我们来看一个例子：
 
 ```js
 const Meteor.users.methods.setUserData = new ValidatedMethod({
@@ -162,20 +162,20 @@ const Meteor.users.methods.setUserData = new ValidatedMethod({
 });
 ```
 
-The above Method is great because you can have the flexibility of having some optional fields and only passing the ones you want to change. In particular, what makes it possible for this Method is that the security considerations of setting one's full name and date of birth are the same - we don't have to do different security checks for different fields being set. Note that it's very important that the `$set` query on MongoDB is generated on the server - we should never take MongoDB operators as-is from the client, since they are hard to validate and could result in unexpected side effects.
+上面的是一个很好的 Method 因为你可以掌控灵活性，可以有一些可选择的域但是只传递希望改变的域。这个方法之所以可行是因为设置用户的全名和生日的安全性考虑是一样的——我们不需要对不同的域设置不同的安全验证。请注意在 MongoDB 执行 `$set` 查询是在服务器产生的——我们不应该在客户端执行同样的 MongoDB 查询，因为这样很难验证，而且很可能会带来副作用。
 
 <h4 id="reusing-security-rules">重构以重新使用安全性规则</h4>
 
-You might run into a situation where many Methods in your app have the same security checks. This can be simplified by factoring out the security into a separate module, wrapping the Method body, or extending the `Mongo.Collection` class to do security inside the `insert`, `update`, and `remove` implementations on the server. However, implementing your client-server communication via specific Methods is still a good idea rather than sending arbitrary `update` operators from the client, since a malicious client can't send an `update` operator that you didn't test for.
+在应用中可能会遇到多个 Method 使用同样的安全性验证。这可以通过将安全性验证代码分离出来成为一个模块，封装 Method 本身，或者拓展 `Mongo.Collection` 类，然后在服务器端的 `insert`, `update` 和 `remove` 里面检测。但是，通过特定的 Method 实施客户端的沟通会比从客户端发送随意的 `update` 操作要好，因为恶意用户不能发送未经检查的 `update` 操作。
 
-<h3 id="rate-limiting">Rate limiting</h3>
+<h3 id="rate-limiting">速率限制</h3>
 
-Just like REST endpoints, Meteor Methods can easily be called from anywhere - a malicious program, script in the browser console, etc. It is easy to fire many Method calls in a very short amount of time. This means it can be easy for an attacker to test lots of different inputs to find one that works. Meteor has built-in rate limiting for password login to stop password brute-forcing, but it's up to you to define rate limits for your other Methods.
+跟 REST 端点一样，Meteor Methods 可以在任何地方调用——一个恶毒的项目，浏览器控制台的脚本等。这可以很容易在短时间内启动多个 Method 调用。这意味着黑客可以很轻易地测试所有的输入，然后找到关键输入。Meteor 的密码登录有内置的速率限制来防止暴力破解，但是你可以为你的其他方法设置速率限制。
 
-In the Todos example app, we use the following code to set a basic rate limit on all Methods:
+在 Todos 应用中，我们使用下面的代码给所有的 Method 设置一个基础速率限制：
 
 ```js
-// Get list of all method names on Lists
+// 获取列表的所有 method 名称
 const LISTS_METHODS = _.pluck([
   insert,
   makePublic,
@@ -184,37 +184,37 @@ const LISTS_METHODS = _.pluck([
   remove,
 ], 'name');
 
-// Only allow 5 list operations per connection per second
+// 每个链接每秒钟只允许 5 个列表操作
 DDPRateLimiter.addRule({
   name(name) {
     return _.contains(LISTS_METHODS, name);
   },
 
-  // Rate limit per connection ID
+  // 每个链接 ID 的速率限制
   connectionId() { return true; }
 }, 5, 1000);
 ```
 
-This will make every Method only callable 5 times per second per connection. This is a rate limit that shouldn't be noticeable by the user at all, but will prevent a malicious script from totally flooding the server with requests. You will need to tune the limit parameters to match your app's needs.
+这将使得每个 Method 每秒钟每个链接只能调用 5 次。用户不应该注意到这种速率限制，但是可以阻止恶意脚本请求充斥服务器。你可以根据你的应用需要调整速率限制参数。
 
 <h2 id="publications">Publications</h2>
 
-Publications are the primary way a Meteor server can make data available to a client. While with Methods the primary concern was making sure users can't modify the database in unexpected ways, with publications the main issue is filtering the data being returned so that a malicious user can't get access to data they aren't supposed to see.
+Publications 是 Meteor 服务器提供数据给客户端的主要方式。虽然使用 Method 主要考虑是确保用户不能按照我们不希望的方式修改数据库，但是使用 publication 的主要原因是过滤返回的数据，这样恶意用户就不能看到我们不希望用户看到的数据。
 
-#### You can't do security at the rendering layer
+#### 你不能在渲染层确保安全性
 
-In a server-side-rendered framework like Ruby on Rails, it's sufficient to simply not display sensitive data in the returned HTML response. In Meteor, since the rendering is done on the client, an `if` statement in your HTML template is not secure; you need to do security at the data level to make sure that data is never sent in the first place.
+In a server-side-rendered framework like Ruby on Rails, it's sufficient to simply not display sensitive data in the returned HTML response. In Meteor, since the rendering is done on the client, an `if` statement in your HTML template is not secure; you need to do security at the data level to make sure that data is never sent in the first place. 在 Ruby on Rails 这种在服务器层渲染的价格，
 
-<h3 id="method-rules">Rules about Methods still apply</h3>
+<h3 id="method-rules">有关 Method 的规则仍然适用</h3>
 
-All of the points above about Methods apply to publications as well:
+上面讲 Method 时提到的点对 publication 也适用：
 
 1. Validate all arguments using `check` or `aldeed:simple-schema`.
 1. Never pass the current user ID as an argument.
 1. Don't take generic arguments; make sure you know exactly what your publication is getting from the client.
 1. Use rate limiting to stop people from spamming you with subscriptions.
 
-<h3 id="fields">Always restrict fields</h3>
+<h3 id="fields">总是严格限制域</h3>
 
 [`Mongo.Collection#find` has an option called `fields`](http://docs.meteor.com/#/full/find) which lets you filter the fields on the fetched documents. You should always use this in publications to make sure you don't accidentally publish secret fields.
 
