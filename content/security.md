@@ -203,32 +203,30 @@ Publications 是 Meteor 服务器提供数据给客户端的主要方式。虽�
 
 #### 你不能在渲染层确保安全性
 
-In a server-side-rendered framework like Ruby on Rails, it's sufficient to simply not display sensitive data in the returned HTML response. In Meteor, since the rendering is done on the client, an `if` statement in your HTML template is not secure; you need to do security at the data level to make sure that data is never sent in the first place. 在 Ruby on Rails 这种在服务器层渲染的价格，
+像 Ruby on Rails 这种在服务器层渲染的架构，有足够的原因不要再返回的 HTML 响应中展示敏感数据。但在 Meteor 中，因为渲染是在客户端发生的，一个 `if` 语句在 HTML 模板中是不安全；需要在数据层做好安全性检测以确保数据不会在第一时间被发送。
 
 <h3 id="method-rules">有关 Method 的规则仍然适用</h3>
 
 上面讲 Method 时提到的点对 publication 也适用：
 
-1. Validate all arguments using `check` or `aldeed:simple-schema`.
-1. Never pass the current user ID as an argument.
-1. Don't take generic arguments; make sure you know exactly what your publication is getting from the client.
-1. Use rate limiting to stop people from spamming you with subscriptions.
+1. 使用 `check` 和 `aldeed:simple-schema` 验证所有参数
+1. 不要将当前用户 ID 作为参数传送
+1. 不要使用通用参数；你应该清楚知道 publication 从客户端获取什么数据。
+1. 使用速率限制阻止收到大量垃圾订阅。
 
 <h3 id="fields">总是严格限制域</h3>
 
-[`Mongo.Collection#find` has an option called `fields`](http://docs.meteor.com/#/full/find) which lets you filter the fields on the fetched documents. You should always use this in publications to make sure you don't accidentally publish secret fields.
+[`Mongo.Collection#find` 有一个选项叫 `域`](http://docs.meteor.com/#/full/find)可以让你在获取的文件中过滤这些域。你应该总是在 publication 使用这个功能已确保不会意外发布私密域。
 
-For example, you could write a publication, then later add a secret field to the published collection. Now, the publication would be sending that secret to the client. If you filter the fields on every publication when you first write it, then adding another field won't automatically publish it.
+例如，你可以写一个 publication，稍后再往 published 数据集添加一个私有域。现在，publication 会发生私密数据到客户端。如果在写 publication 的时候就过滤这些域，那么稍后添加一个域，改域是不会自动发布的。
 
 ```js
-// #1: Bad! If we add a secret field to Lists later, the client
-// will see it
+// #1: 错误！如果我们稍后添加一个私有域，客户端是可以看到的。
 Meteor.publish('lists.public', function () {
   return Lists.find({userId: {$exists: false}});
 });
 
-// #2: Good, if we add a secret field to Lists later, the client
-// will only publish it if we add it to the list of fields
+// #2: 正确，如果我们稍后往列表添加私有域，客户端将其发布到客户端。
 Meteor.publish('lists.public', function () {
   return Lists.find({userId: {$exists: false}}, {
     fields: {
@@ -240,10 +238,10 @@ Meteor.publish('lists.public', function () {
 });
 ```
 
-If you find yourself repeating the fields often, it makes sense to factor out a dictionary of public fields that you can always filter by, like so:
+如果你发现经常重复某些域，那就把公共域字典分离出来，这样在过滤的时候就可以多次使用它：
 
 ```js
-// In the file where Lists is defined
+// 在定义列表的文件里
 Lists.publicFields = {
   name: 1,
   incompleteCount: 1,
@@ -251,7 +249,7 @@ Lists.publicFields = {
 };
 ```
 
-Now your code becomes a bit simpler:
+这样代码就变得更简单了：
 
 ```js
 Meteor.publish('lists.public', function () {
@@ -261,14 +259,14 @@ Meteor.publish('lists.public', function () {
 });
 ```
 
-<h3 id="publications-user-id">Publications and userId</h3>
+<h3 id="publications-user-id">Publications 和 userId</h3>
 
-The data returned from publications will often be dependent on the currently logged in user, and perhaps some properties about that user - whether they are an admin, whether they own a certain document, etc.
+从 publications 返回的数据经常依赖于当前登录用户，或者跟用户属性有关——该用户是管理员，或者该用户拥有某粉特殊文件等。
 
-Publications are not reactive, and they only re-run when the currently logged in `userId` changes, which can be accessed through `this.userId`. Because of this, it's easy to accidentally write a publication that is secure when it first runs, but doesn't respond to changes in the app environment. Let's look at an example:
+Publications 是非响应式的，只有在当前 `userId` 改变的时候才会重新运行，当前用户 ID 可以通过 `this.userId` 获取。因为这个原因，写的 publication 很可能在第一次运行的时候是安全的，但是不会响应应用环境的改变。我们来看一个例子：
 
 ```js
-// #1: Bad! If the owner of the list changes, the old owner will still see it
+// #1: 错误！如果列表的拥有者改变了，原先的拥有者还是会看到它。
 Meteor.publish('list', function (listId) {
   check(listId, String);
 
@@ -288,7 +286,7 @@ Meteor.publish('list', function (listId) {
   });
 });
 
-// #2: Good! When the owner of the list changes, the old owner won't see it anymore
+// #2: 正确！如果列表的拥有者改变了，原先的拥有者不会再看到它
 Meteor.publish('list', function (listId) {
   check(listId, String);
 
@@ -305,21 +303,21 @@ Meteor.publish('list', function (listId) {
 });
 ```
 
-In the first example, if the `userId` property on the selected list changes, the query in the publication will still return the data, since the security check in the beginning will not re-run. In the second example, we have fixed this by putting the security check in the returned query itself.
+在第一个例子中，如果所选择的列表其 `userId` 属性改变，publication 查询依然会返回原来的数据，因为在代码开始的安全性检查不会重新运行。在第二个例子中，我们通过把安全性检测放在返回查询中来解决这个问题。
 
-Unfortunately, not all publications are as simple to secure as the example above. For more tips on how to use `reywood:publish-composite` to handle reactive changes in publications, see the [data loading article](data-loading.html#complex-auth).
+不幸的是，不是所有的 publication 的安全性检测都向上面的例子一样简单。关于如何使用 `reywood:publish-composite` 在 publication 中处理响应式改变，请查看[数据加载文章](data-loading.html#complex-auth)。
 
-<h3 id="publication-options">Passing options</h3>
+<h3 id="publication-options">传递选项</h3>
 
-For certain applications, for example pagination, you'll want to pass options into the publication to control things like how many documents should be sent to the client. There are some extra considerations to keep in mind for this particular case.
+对于特定的 publication，例如分页，会需要传递选项给 publication 用于控制发送到客户端的文件数量。关于这个有几点需要额外注意：
 
-1. **Passing a limit**: In the case where you are passing the `limit` option of the query from the client, make sure to set a maximum limit. Otherwise, a malicious client could request too many documents at once, which could raise performance issues.
-2. **Passing in a filter**: If you want to pass fields to filter on because you don't want all of the data, for example in the case of a search query, make sure to use MongoDB `$and` to intersect the filter coming from the client with the documents that client should be allowed to see. Also, you should whitelist the keys that the client can use to filter - if the client can filter on secret data, it can run a search to find out what that data is.
-3. **Passing in fields**: If you want the client to be able to decide which fields of the collection should be fetched, make sure to intersect that with the fields that client is allowed to see, so that you don't accidentally send secret data to the client.
+1. **传递一个限制**: 在需要从客户端传递 `limit` 选项查询查询数据的情况下，确保设置最大限制。否则的话，恶意用户可以一次性请求超多文件，进而引发性能问题。
+2. **传递一个过滤器**: 如果因为不需要所有的数据，将一个域传递给过滤器，例如搜索查询，请确保使用 MongoDB `$and` 使来自客户端的域和客户允许看到的文件进行交互——如何客户端可以过滤私密数据，可以运行搜索，找出该数据是什么。
+3. **传递一个域**: 如果你希望客户端有能力决定获取数据集中的哪个域，那么请确保这些域跟用户可以看到的域交互，以避免用户看到不该看到的数据。
 
-In summary, you should make sure that any options passed from the client to a publication can only restrict the data being requested, rather than extending it.
+总的来说，你应该确保从客户端传递给 publication 的数据只能限制在我们要求的范围内，而不是范围之外的数据。
 
-<h2 id="served-files">Served files</h2>
+<h2 id="served-files">服务器文件</h2>
 
 Publications are not the only place the client gets data from the server. The set of source code files and static assets that are served by your application server could also potentially contain sensitive data:
 
@@ -327,7 +325,7 @@ Publications are not the only place the client gets data from the server. The se
 1. Secret algorithms that a competitor could steal.
 1. Secret API keys.
 
-<h3 id="secret-code">Secret server code</h3>
+<h3 id="secret-code">私密服务器代码</h3>
 
 While the client-side code of your application is necessarily accessible by the browser, every application will have some secret code on the server that you don't want to share with the world.
 
@@ -393,15 +391,15 @@ Here's what a settings file with some API keys might look like:
 }
 ```
 
-In your app's JavaScript code, these settings can be accessed from the variable `Meteor.settings`.
+在你应用的 JavaScript 代码中，这些设置可以通过变量 `Meteor.settings` 获得。
 
-[Read more about managing keys and settings in the Deployment article.](deployment.html#environment)
+[了解更多管理钥匙和设置的请查看部署文章](deployment.html#environment)
 
-<h3 id="client-settings">Settings on the client</h3>
+<h3 id="client-settings">客户端设置</h3>
 
 In most normal situations, API keys from your settings file will only be used by the server, and by default the data passed in through `--settings` is only available on the server. However, if you put data under a special key called `public`, it will be available on the client. You might want to do this if, for example, you need to make an API call from the client and are OK with users knowing that key. Public settings will be available on the client under `Meteor.settings.public`.
 
-<h3 id="api-keys-oauth">API keys for OAuth</h3>
+<h3 id="api-keys-oauth">OAuth 的 API 接口密钥</h3>
 
 For the `accounts-facebook` package to pick up these keys, you need to add them to the service configuration collection in the database. Here's how you do that:
 
