@@ -319,31 +319,31 @@ Meteor.publish('list', function (listId) {
 
 <h2 id="served-files">服务器文件</h2>
 
-Publications are not the only place the client gets data from the server. The set of source code files and static assets that are served by your application server could also potentially contain sensitive data:
+虽然 Publications 是客户端从服务器获取数据的主要方式，但不是唯一的方式。服务器托管你的应用的一系列源码和静态资产也可能包含敏感数据：
 
-1. Business logic an attacker could analyze to find weak points.
-1. Secret algorithms that a competitor could steal.
-1. Secret API keys.
+1. 黑客可以通过分析应用的商业逻辑找出应用的薄弱点。
+1. 竞争对手可以偷取的私密算法。
+1. API 接口密钥
 
 <h3 id="secret-code">私密服务器代码</h3>
 
-While the client-side code of your application is necessarily accessible by the browser, every application will have some secret code on the server that you don't want to share with the world.
+浏览器一定可以获取应用在客户端的代码，但每个应用或多或少都会在服务器存有私密代码，这些代码是不能给用户看到的。
 
-Secret business logic in your app should be located in code that is only loaded on the server. This means it is in a `server/` directory of your app, in a package that is only included on the server, or in a file inside a package that was loaded only on the server.
+应用中关于商业逻辑的私密代码应该被存储在服务器。这意味着要把这些代码放在应用中的 `server/` 目录，或者放在一个只位于服务器的包，或放在一个只位于服务器的包里面的文件夹。
 
-If you have a Meteor Method in your app that has secret business logic, you might want to split the Method into two functions - the optimistic UI part that will run on the client, and the secret part that runs on the server. Most of the time, putting the entire Method on the server doesn't result in the best user experience. Let's look at an example, where you have a secret algorithm for calculating someone's MMR (ranking) in a game:
+如果你的 Meteor 应用中有一个 Method 包含私密的商业逻辑，那最好将该 Method 一分为二——一部分是在客户端运行的优化 UI 组件，另外一部分是在服务器运行的私密代码。大部分情况下，把整个 Method 放在服务器运行都不会得到最好的用户体验。我们来看一个例子，在这个例子中有一个计算玩家在游戏中排名(MMR)的私密逻辑：
 
 ```js
-// In a server-only file
+// 放在一个只位于服务器的文件夹
 MMR = {
   updateWithSecretAlgorithm(userId) {
-    // your secret code here
+    // 私密代码放在这里
   }
 }
 ```
 
 ```js
-// In a file loaded on client and server
+// 在一个客户端和服务器端共享的文件夹
 const Meteor.users.methods.updateMMR = new ValidatedMethod({
   name: 'Meteor.users.methods.updateMMR',
   validate: null,
@@ -357,30 +357,30 @@ const Meteor.users.methods.updateMMR = new ValidatedMethod({
 });
 ```
 
-Note that while the Method is defined on the client, the actual secret logic is only accessible from the server. Keep in mind that code inside `if (Meteor.isServer)` blocks is still sent to the client, it is just not executed. So don't put any secret code in there.
+注意到虽然我们在客户端定义 Method，但是私密代码是在服务器上运行的。请注意放在 `if (Meteor.isServer)` 下面的代码还是会发生到客户端，只是不会在客户端执行。所有不要将任何私密代码放在 `if (Meteor.isServer)`。
 
-Secret API keys should never be stored in your source code at all, the next section will talk about how to handle them.
+私密的 API 接口密钥不应该存储在代码中，下面我们将讲解应该如何处理。
 
-<h2 id="api-keys">Securing API keys</h2>
+<h2 id="api-keys">API 接口密钥安全性</h2>
 
-Every app will have some secret API keys or passwords:
+每个应用或多或少都有一些私密的 API 接口密钥或密码：
 
-1. Your database password.
-1. API keys for external APIs.
+1. 数据库的密码。
+1. 外部 API 接口密钥。
 
-These should never be stored as part of your app's source code in version control, because developers might copy code around to unexpected places and forget that it contains secret keys. You can keep your keys separately in [Dropbox](https://www.dropbox.com/), [LastPass](https://lastpass.com), or another service, and then reference them when you need to deploy the app.
+这些密钥或密码在版本控制中不应该跟应用的源码存储在一起，因为开发者可能会无意识中复制包含密钥的源代码到其他地方。可以将密钥分离开来并存储在[Dropbox](https://www.dropbox.com/)，或[LastPass](https://lastpass.com)，或其他服务，然后在部署应用的时候再链接到这些密钥。
 
-You can pass settings to your app through a _settings file_ or an _environment variable_. Most of your app settings should be in JSON files that you pass in when starting your app. You can start your app with a settings file by passing the `--settings` flag:
+可以通过一个设置文件或环境变量文件传递设置给你的应用，应用的大部分设置都应该被存储在 JSON 文件中，然后在应用启动的时候传递给应用。在应用启动的时候通过 `--settings` 就可以传递相关设置信息：
 
-```sh
-# Pass development settings when running your app locally
+```sh 
+# 在本地运行应用的时候传递 development 设置
 meteor --settings development.json
 
-# Pass production settings when deploying your app to Galaxy
+# 在 Galaxy 部署应用的时候传递 production 设置
 meteor deploy myapp.com --settings production.json
 ```
 
-Here's what a settings file with some API keys might look like:
+下面是一个带有密钥的设置文件：
 
 ```js
 {
