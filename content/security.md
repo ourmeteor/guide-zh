@@ -14,7 +14,7 @@ discourseTopicId: 19667
 
 <h1 id="introduction">简介</h1>
 
-Securing a web application is all about understanding security domains and understanding the attack surface between these domains. In a Meteor app, things are pretty simple:保证一个应用的安全就是理解安全域和安全域之间的攻击界面。在一个 Meteor 应用中，其实很简单：
+保证一个应用的安全就是理解安全域和安全域之间的攻击界面。在一个 Meteor 应用中，其实很简单：
 
 1. 服务器上运行的代码可以被信任。
 2. 其他：客户端上运行的代码，通过 Method 和 publication 参数传输的数据等，都是不能被信任的。
@@ -60,7 +60,7 @@ Method 是 Meteor 应用从外部接收输入和数据的方式，所以从应�
 
 <h3 id="validate-arguments">验证所有的参数</h3>
 
-如果输入是正确的，那么写简洁欸的代码就会更容易，所有在运行任何代码前验证所有 Method 的参数是很重要的。你不会希望用户输入不正确的数据类型进而导致程序崩溃。
+如果输入是正确的，那么写简洁的代码就会更容易，所有在运行任何代码前验证所有 Method 的参数是很重要的。你不会希望用户输入不正确的数据类型进而导致程序崩溃。
 
 假设你正在写 Method 的单元测试，你需要检查所有可能的 Method 数据输入；验证参数可以把需要做单元测试的输入限定在一个范围内，减少代码量。自我记录也是很好的一个习惯；其他开发者可以通过查看你的代码了解 Method 所要求的参数类型。
 
@@ -88,7 +88,7 @@ Meteor.methods({
 
 Meteor Method 的 `this` 语境可以包含一些当前连接的有用信息，最有用的是[`this.userId`](http://docs.meteor.com/#/full/method_userId)。这个属性是 DDP 登录系统在管理，由框架本身保证其安全性。
 
-当前用户的用户 ID 可以根据 `this` 获取，所以不应该将当前用户的 ID 作为参数传递给 Method。因为这将使得任何客户端可以传递任何用户 ID。我们看下面这个例子：
+当前用户的用户 ID 可以根据 `this` 获取，所以不应该将用户的 ID 作为参数传递给 Method。因为这将使得任何客户端可以传递任何用户 ID。我们看下面这个例子：
 
 ```js
 // #1: 错误！客户端可以传递任何用户的 ID 并更改其姓名。
@@ -109,7 +109,7 @@ setName({ newName }) {
 需要传递任何用户 ID 作为参数的只有下面几种情况：
 
 1. 只有管理员才可以接触到的 Method，用于编辑其他用户资料。请查看[用户角色](accounts.html##roles-and-permissions)章节了解如何判断用户的角色和权限。
-2. 不用于修改其他用户的 Method，而是作为目标；例如，该 Methood 可以用于发送私信，或者添加其他用户为好友。
+2. 不用于修改其他用户的 Method，而是作为目标；例如，该 Method 可以用于发送私信，或者添加其他用户为好友。
 
 <h3 id="specific-action">每个行为用一个 Method</h3>
 
@@ -397,19 +397,19 @@ meteor deploy myapp.com --settings production.json
 
 <h3 id="client-settings">客户端设置</h3>
 
-In most normal situations, API keys from your settings file will only be used by the server, and by default the data passed in through `--settings` is only available on the server. However, if you put data under a special key called `public`, it will be available on the client. You might want to do this if, for example, you need to make an API call from the client and are OK with users knowing that key. Public settings will be available on the client under `Meteor.settings.public`.
+在大部分情况下，设置文件中的 API 接口密钥只会在服务器中使用，而且默认情况下通过 `--settings` 传递的数据只能在服务器使用。但是，如果把数据放在 `public` 文件夹下，在客户端就可以看到。当需要用户从客户端调用 API 并且用户可以知道这些密钥的时候，就可以这样做。公共设置通过 `Meteor.settings.public` 可以在客户端获得。
 
 <h3 id="api-keys-oauth">OAuth 的 API 接口密钥</h3>
 
-For the `accounts-facebook` package to pick up these keys, you need to add them to the service configuration collection in the database. Here's how you do that:
+`accounts-facebook` 包需要这些 API 接口密钥，所有需要将其添加到数据库中的服务配置数据集。可以这样做：
 
-First, add the `service-configuration` package:
+首先，添加 `service-configuration` 包：
 
 ```sh
 meteor add service-configuration
 ```
 
-Then, upsert into the `ServiceConfiguration` collection:
+然后，添加到 `ServiceConfiguration` 数据集：
 
 ```js
 ServiceConfiguration.configurations.upsert({
@@ -423,36 +423,36 @@ ServiceConfiguration.configurations.upsert({
 });
 ```
 
-Now, `accounts-facebook` will be able to find that API key and Facebook login will work properly.
+现在， `accounts-facebook` 包可以找到 API 密钥，可以使用 Facebook 登录系统。
 
 <h2 id="ssl">SSL</h2>
 
-This is a very short section, but it deserves its own place in the table of contents.
+这里讲 SSL 的文字不多，但是也有必要讲一下。
 
-**Every production Meteor app that handles user data should run with SSL.**
+**每个生产中的 Meteor 应用，如果处理用户数据的话，都是跟 SSL 一起运行的。**
 
-For the uninitiated, this means all of your HTTP requests should go over HTTPS, and all websocket data should be sent over WSS.
+对于外行来说，这意味着所有的 HTTP 请求都应该通过 HTTPS，所有的 websocket 数据都应该通过 WSS 发送。
 
-Yes, Meteor does hash your password or login token on the client before sending it over the wire, but that only prevents an attacker from figuring out your password - it doesn't prevent them from logging in as you, since they could just send the hashed password to the server to log in! No matter how you slice it, logging in requires the client to send sensitive data  to the server, and the only way to secure that transfer is by using SSL. Note that the same issue is present when using cookies for authentication in a normal HTTP web application, so any app that needs to reliably identify users should be running on SSL.
+.Meteor 确实会在发送你的密码或者登录密钥之前在客户端哈希化，但这只可以阻止黑客识别密码 —— 不能阻止黑客以你的身份登陆，因为他们可以发送哈希密码到服务器实现登录！不管你如何分离代码，登录意味着需要客户端发送敏感数据到服务器，保证这个发送安全的唯一方式就是使用 SSL。注意到当在一个普通的 HTTP 应用使用 cookies 认证的时候也会出现这种问题，所有任何需要可靠地识别用户的应用都应该在 SSL 上运行。
 
-You can ensure that any unsecured connection to your app redirects to a secure connection by adding the `force-ssl` package.
+添加 `force-ssl` 包后可以确保任何不安全的应用链接都会被重定向到安全链接。
 
-#### Setting up SSL
+#### 设置 SSL
 
-1. On [Galaxy](deployment.html#galaxy), most things are set up for you, but you need to add a certificate. [See the help article about SSL on Galaxy](https://galaxy.meteor.com/help/using-ssl).
-2. If you are running on your own [infrastructure](deployment.html#custom-deployment), there are a few options for setting up SSL, mostly through configuring a proxy web server. See the articles: [Josh Owens on SSL and Meteor](http://joshowens.me/ssl-and-meteor-js/), [SSL on Meteorpedia](http://www.meteorpedia.com/read/SSL), and [Digital Ocean tutorial with an Nginx config](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-meteor-js-application-on-ubuntu-14-04-with-nginx).
+1. [Galaxy](deployment.html#galaxy) 大部分都设置好了，但需要添加一个认证。[请查看 SSL 和 Galaxy 帮助文档](https://galaxy.meteor.com/help/using-ssl)。
+2. 如果你在自己搭的[框架](deployment.html#custom-deployment)上运行，有几种选择可以设置 SSL, 大部分是通过配置代理 web 服务器。参考文章[Josh Owens on SSL and Meteor](http://joshowens.me/ssl-and-meteor-js/), [SSL on Meteorpedia](http://www.meteorpedia.com/read/SSL), 以及 [Digital Ocean tutorial with an Nginx config](https://www.digitalocean.com/community/tutorials/how-to-deploy-a-meteor-js-application-on-ubuntu-14-04-with-nginx)。
 
-<h2 id="checklist">Security checklist</h2>
+<h2 id="checklist">安全清单</h2>
 
-This is a collection of points to check about your app that might catch common errors. However, it's not an exhaustive list yet---if we missed something, please let us know or file a pull request!
+下面的安全清单列表可以捕获一些常见的错误。但是，这不是一份详尽的清单 —— 如果你有补充的请提交一个 PR!
 
-1. Make sure your app doesn't have the `insecure` or `autopublish` packages.
-1. Validate all Method and publication arguments, and include the `audit-argument-checks` to check this automatically.
-1. [Deny writes to the `profile` field on user documents.](accounts.html#dont-use-profile)
-1. [Use Methods instead of client-side insert/update/remove and allow/deny.](security.html#allow-deny)
-1. Use specific selectors and [filter fields](http://guide.meteor.com/security.html#fields) in publications.
-1. Don't use [raw HTML inclusion in Blaze](blaze.html#rendering-html) unless you really know what you are doing.
-1. [Make sure secret API keys and passwords aren't in your source code.](security.html#api-keys)
-1. Secure the data, not the UI - redirecting away from a client-side route does nothing for security, it's just a nice UX feature.
-1. [Don't ever trust user IDs passed from the client.](http://guide.meteor.com/security.html#user-id-client) Use `this.userId` inside Methods and publications.
-1. Set up [browser policy](https://atmospherejs.com/meteor/browser-policy), but know that not all browsers support it so it just provides an extra layer of security to users with modern browsers.
+1. 确保应用中删除了  `insecure` 包和 `autopublish` 包。
+1. 验证所有的 Method 和 publication 参数，并通过 `audit-argument-checks` 自动检测。
+1. [Deny writes to the `profile` field on user documents.](accounts.html#dont-use-profile)[拒绝写入用户文件的 `profile` 域](accounts.html#dont-use-profile)
+1. [使用 Methods 而不使用客户端的 insert/update/remove 以及 allow/deny.](security.html#allow-deny)
+1. 在 publication 中使用特殊的选择器和[过滤器](http://guide.meteor.com/security.html#fields)
+1. 不要使用[raw HTML inclusion in Blaze](blaze.html#rendering-html)，除非你知道怎么用。
+1. [确保 API 接口密钥和密码不会在源码中出现](security.html#api-keys)
+1. Secure the data, not the UI 确保数据安全，而不是 UI安全 —— 在客户端重定向路径并不能保证安全性，只是优化了用户体验。
+1. [不要信任从客户端传递的用户 ID](http://guide.meteor.com/security.html#user-id-client)，在 Method 和 publication 中使用 `this.userId`。
+1. 设置[浏览器策略](https://atmospherejs.com/meteor/browser-policy)，但并不是所有的浏览器都支持，只是给使用现代浏览器的用户多加一层保护层。
