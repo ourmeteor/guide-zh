@@ -129,43 +129,7 @@ meteor npm install --save-dev babel-eslint eslint-config-airbnb eslint-plugin-im
 meteor npm run lint
 ```
 
-<<<<<<< HEAD
-如果你在一个 `meteor create myapp` 生成的项目中得到下面这样的错误：
-
-```bash
-/opt/www/sites/me/myapp/client/main.js
-   1:26  error  Unable to resolve path to module 'meteor/templating'    import/no-unresolved
-   2:29  error  Unable to resolve path to module 'meteor/reactive-var'  import/no-unresolved
-  18:25  error  Invalid parameter name, use "templateInstance" instead  meteor/eventmap-params
-
-/opt/www/sites/me/myapp/server/main.js
-  1:24  error  Unable to resolve path to module 'meteor/meteor'  import/no-unresolved
-```
-
-你只要在 `eslintConfig` 的 `rules` 里添加一些东西就能让它闭嘴，像这样：
-
-```
-{
-  ...
-  "eslintConfig": {
-   ...
-    "rules": {
-      "meteor/eventmap-params": [
-        2, { "templateInstanceParamName": "instance" }
-      ],
-      "import/no-unresolved": [
-        2, { "ignore": ["^meteor/"] }
-      ]
-    }
-  }
-}
-```
-
-
 更多细节请在 ESLint 网站上 [Getting Started](http://eslint.org/docs/user-guide/getting-started) 一节了解。
-=======
-For more details, read the [Getting Started](http://eslint.org/docs/user-guide/getting-started) directions from the ESLint website.
->>>>>>> b065d0d3a9469e032562f79ddb06b5e38b425aa9
 
 <h3 id="eslint-editor">与你的编辑器集成</h3>
 
