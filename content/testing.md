@@ -199,7 +199,7 @@ StubCollections.restore();
 
 <h3 id="simple-blaze-unit-test">一个简单的 Blaze 单元测试</h3>
 
-在[Todos](https://github.com/meteor/todos)这个示例应用中，多亏了这样一个事实：我们将用户界面拆分为[智能组件和可重用组件](ui-ux.html#components)，因此我们会自然而然地想到要对这些可重用组件中的一部分进行单元测试（在下文中，我们将会了解到如何对这些智能的组件进行[集成测试](#simple-integration-test)）。
+在 [Todos](https://github.com/meteor/todos) 这个示例应用中，多亏了这样一个事实：我们将用户界面拆分为[智能组件和可重用组件](ui-ux.html#components)，因此我们会自然而然地想到要对这些可重用组件中的一部分进行单元测试（在下文中，我们将会了解到如何对这些智能的组件进行[集成测试](#simple-integration-test)）。
 
 为了完成这个测试，我们会使用一个简单的测试 helper 构件，它会使用一个给定数据的上下文来渲染一个屏幕中不可见的 Blaze 组件。我们会把它放置于 `imports` 目录中，它并不会在普通模式下被加载到我们的应用中（因为在此模式中，没有任何导入它的代码）。
 
@@ -404,18 +404,18 @@ meteor test --driver-package practicalmeteor:mocha --port 3100
 
 在[上述的单元测试](#simple-blaze-unit-test)中，我们通过一个非常受限的例子来了解了如何从一个庞大的应用中将单个模块隔离开来。这一点对于恰当的单元测试而言非常重要。这里还有一些实用程序和技术可供参考：
 
-  - [`velocity:meteor-stubs`](https://atmospherejs.com/velocity/meteor-stubs)包，它可以为 Meteor 的大部分核心对象建立简单的 stubs。
+  - [`velocity:meteor-stubs`](https://atmospherejs.com/velocity/meteor-stubs) 包，它可以为 Meteor 的大部分核心对象建立简单的 stubs。
 
-  - 或者你可以使用诸如[Sinon](http://sinonjs.org)一类的工具来直接 stub 你所需要的东西，正如我们在[simple integration test](#simple-integration-test)这个例子中所看到那样。
+  - 或者你可以使用诸如 [Sinon](http://sinonjs.org) 一类的工具来直接 stub 你所需要的东西，正如我们在 [simple integration test](#simple-integration-test) 这个例子中所看到那样。
 
-  - 还有我们在[上面](#mocking-the-database)提到过的[`hwillson:stub-collections`](https://atmospherejs.com/hwillson/stub-collections)这个包。
+  - 还有我们在[上面](#mocking-the-database)提到过的 [`hwillson:stub-collections`](https://atmospherejs.com/hwillson/stub-collections) 这个包。
 
 如何更好地实施隔离并选择与测试相应的使用工具，这其中有着很大的发挥空间。
 > 原文：There's a lot of scope for better isolation and testing utilities.
 
 <h4 id="testing-publications">测试发布</h4>
 
-使用[`johanbrook:publication-collector`](https://atmospherejs.com/johanbrook/publication-collector)这个包，你可以单独测试发布的输出，而不用按照惯例为之创建一个订阅：
+使用 [`johanbrook:publication-collector`](https://atmospherejs.com/johanbrook/publication-collector) 这个包，你可以单独测试发布的输出，而不用按照惯例为之创建一个订阅：
 
 ```js
 describe('lists.public', function () {
@@ -445,7 +445,7 @@ describe('lists.public', function () {
 
 尽管在概念上不同于单元测试，然而这类测试往往不需要运行任何与单元测试不同的代码，并且，像在单元测试中一样，我们也同样可以使用 [`meteor test` 模式](#running-unit-tests)和[隔离技术](#isolation-techniques)。
 
-不过，在 Meteor 应用中（如果被测试的模块正好跨越了客户端 - 服务端边界），跨越了客户端 - 服务端边界的集成测试，需要一个独特的底层技术的支持，即 Meteor 的 "full app" 测试模式。
+不过，在 Meteor 应用中（如果被测试的模块正好跨越了客户端 - 服务端边界），跨越了客户端 - 服务端边界的集成测试，需要一个独特的底层技术的支持，即 Meteor 的「全应用」测试模式。
 
 让我们看看这两种测试的例子。
 
@@ -526,17 +526,17 @@ describe('Lists_show_page', function () {
 
 <h4 id="simple-integration-test-stubbing">Stubbing</h4>
 
-由于集成测试中的系统拥有更大的表层区域，我们需要 stub 应用栈在集成过程中需要但在测试中需要模拟的其余的更多要点。这里需要特别注意，我们使用了[`hwillson:stub-collections`](#mocking-the-database)和[Sinon](http://sinonjs.org)两个包来 stub 了 Flow Router 和 Subscription 部分。
+由于集成测试中的系统拥有更大的表层区域，我们需要 stub 应用栈在集成过程中需要但在测试中需要模拟的其余的更多要点。这里需要特别注意，我们使用了 [`hwillson:stub-collections`](#mocking-the-database) 和 [Sinon](http://sinonjs.org) 两个包来 stub 了 Flow Router 和 Subscription 部分。
 
 <h4 id="simple-integration-test-data">创建数据</h4>
 
-在这次测试中，我们使用了[Factory package](#test-data)的 `.create()` API，它会将数据插入到真实的数据库集合中。然而，由于我们将所有 `Todos` 和 `Lists` 集合的方法代理至一个本地集合上（这也是 `hwillson:stub-collections` 所做的事），我们不会因为尝试从客户端执行数据插入而造成任何麻烦。
+在这次测试中，我们使用了 [Factory package](#test-data) 的 `.create()` API，它会将数据插入到真实的数据库集合中。然而，由于我们将所有 `Todos` 和 `Lists` 集合的方法代理至一个本地集合上（这也是 `hwillson:stub-collections` 所做的事），我们不会因为尝试从客户端执行数据插入而造成任何麻烦。
 
 就像我们上面的[单元测试](#running-unit-tests)那样，本次集成测试能够以与其完全一致的方式来运行。
 
 <h3 id="full-app-integration-test">全应用的集成测试</h3>
 
-在[Todos](https://github.com/meteor/todos)这个示例应用程序中，我们有一个测试，是用来保证当我们路由至某个地址时，能够看到一个列表的完整内容。这个测试展示了集成测试中的一些技巧。
+在 [Todos](https://github.com/meteor/todos) 这个示例应用程序中，我们有一个测试，是用来保证当我们路由至某个地址时，能够看到一个列表的完整内容。这个测试展示了集成测试中的一些技巧。
 
 [`imports/startup/client/routes.app-test.js`](https://github.com/meteor/todos/blob/master/imports/startup/client/routes.app-test.js):
 
@@ -624,7 +624,7 @@ meteor test --full-app --driver-package practicalmeteor:mocha
 
 要在全应用测试模式中创建测试数据，通常比较有意义的做法是创建一些特殊的，在客户端调用的测试方法。通常在测试一个完整的应用时，我们希望确保各个发布所发送的都是正确的数据（就像我们在这次测试中所做的那样），这样并不足以构成模拟数据集合并将模拟数据放入其中的理由。相反，我们更愿意在服务端真实地创建数据并将其发布。
 
-就像我们在前面的[测试数据](#test-data)这一部分中，在 `beforeEach` 中使用一个方法来清除数据库那样，我们也能在现在的测试执行前调用一个方法（来生成数据）。在这个针对路由的测试案例中，我们使用的[`imports/api/generate-data.app-tests.js`](https://github.com/meteor/todos/blob/master/imports/api/generate-data.app-tests.js)这个文件，其中便包含了这个方法的定义（它仅会在全应用测试模式中被加载，因此平常是不可用的）：
+就像我们在前面的[测试数据](#test-data)这一部分中，在 `beforeEach` 中使用一个方法来清除数据库那样，我们也能在现在的测试执行前调用一个方法（来生成数据）。在这个针对路由的测试案例中，我们使用的 [`imports/api/generate-data.app-tests.js`](https://github.com/meteor/todos/blob/master/imports/api/generate-data.app-tests.js) 这个文件，其中便包含了这个方法的定义（它仅会在全应用测试模式中被加载，因此平常是不可用的）：
 
 ```js
 // 这个文件将被自动导入至应用测试的上下文中，
@@ -679,7 +679,7 @@ export { generateData };
 
 验收测试是一个利用我们应用的未修改版本，从「外」对其进行测试以保证其像我们所期望那样工作的过程。通常来讲，如果一个应用通过了验收测试，那么从产品角度来讲，我们已经彻底地完成了我们的工作。
 
-由于验收测试是在一个完整的浏览器上下文中，以正常使用的方式来测试应用程序的行为，因此有着非常多的工具可用于描述和运行这些测试。在本指南中，我们将会演示使用[Chimp](https://chimp.readme.io)，这个工具具备了一些简洁的、 Meteor 独有的特性，使得它非常易用。
+由于验收测试是在一个完整的浏览器上下文中，以正常使用的方式来测试应用程序的行为，因此有着非常多的工具可用于描述和运行这些测试。在本指南中，我们将会演示使用 [Chimp](https://chimp.readme.io)，这个工具具备了一些简洁的、 Meteor 独有的特性，使得它非常易用。
 
 Chimp 需要的 node 版本为4或5。你可以通过运行如下命令来检查你的 node 版本：
 
@@ -687,7 +687,7 @@ Chimp 需要的 node 版本为4或5。你可以通过运行如下命令来检查
 node -v
 ```
 
-你可以从[nodejs.org](https://nodejs.org/en/download/)下载安装第4版，或者使用 `brew install node` 来安装第5版。然后使用如下的命令来全局安装 Chimp：
+你可以从 [nodejs.org](https://nodejs.org/en/download/) 下载安装第4版，或者使用 `brew install node` 来安装第5版。然后使用如下的命令来全局安装 Chimp：
 
 ```sh
 npm install --global chimp
@@ -706,7 +706,7 @@ Chimp 拥有大量可选的设置选项，不过我们可以添加一些 npm 脚
 }
 ```
 
-Chimp 现在会从 `tests/` 目录（本来是被 Meteor 工具所忽略的目录）中查找你所定义的验收测试。在[Todos](https://github.com/meteor/todos)这个示例应用中，我们定义了一个简单的测试，用于确保我们能够点击 "create list" 这个按钮。
+Chimp 现在会从 `tests/` 目录（本来是被 Meteor 工具所忽略的目录）中查找你所定义的验收测试。在 [Todos](https://github.com/meteor/todos) 这个示例应用中，我们定义了一个简单的测试，用于确保我们能够点击 "create list" 这个按钮。
 
 [`tests/lists.js`](https://github.com/meteor/todos/blob/master/tests/lists.js):
 
@@ -786,7 +786,7 @@ meteor test --full-app --driver-package tmeasday:acceptance-test-driver
 
 我们已经了解过一个通过命令行运行测试的例子，这个例子使用了 `meteor npm run chimp-test` 这一模式。
 
-我们可以使用为 Mocha 开发的命令行驱动[`dispatch:mocha-phantomjs`](http://atmospherejs.com/dispatch/mocha-phantomjs)，在命令行中运行我们的标准测试。
+我们可以使用为 Mocha 开发的命令行驱动 [`dispatch:mocha-phantomjs`](http://atmospherejs.com/dispatch/mocha-phantomjs)，在命令行中运行我们的标准测试。
 
 添加和使用这个包的方式简单易懂：
 
@@ -811,7 +811,7 @@ meteor test --once --driver-package dispatch:mocha-phantomjs
 
 <h3 id="using-circle-ci">CircleCI</h3>
 
-[CircleCI](https://circleci.com)是一个极好的持续集成服务，它允许我们在每一次有代码推送到像 GitHub 这样的代码库中时运行（可能非常耗时的）测试。要使用它来完成我们在前面所定义的命令行测试，我们可以参照他们的标准[入门教程](https://circleci.com/docs/getting-started)，并按照下面的示范完成一个类似的 `circle.yml` 文件：
+[CircleCI](https://circleci.com) 是一个极好的持续集成服务，它允许我们在每一次有代码推送到像 GitHub 这样的代码库中时运行（可能非常耗时的）测试。要使用它来完成我们在前面所定义的命令行测试，我们可以参照他们的标准[入门教程](https://circleci.com/docs/getting-started)，并按照下面的示范完成一个类似的 `circle.yml` 文件：
 
 ```
 machine:
