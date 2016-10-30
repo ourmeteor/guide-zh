@@ -604,7 +604,7 @@ if (Meteor.isClient) {
 
 这里需要注意：
 
- - 在运行之前，每个测试都会使用 `generateData` helper 来设置它们各自所需要的数据（参见[为集成测试创建数据]这一部分来获得更多信息），然后跳转到首页。
+ - 在运行之前，每个测试都会使用 `generateData` helper 来设置它们各自所需要的数据（参见[为集成测试创建数据](#creating-integration-test-data)这一部分来获得更多信息），然后跳转到首页。
 
  - 尽管 Flow Router 不使用完成后的回调，我们仍然可以使用 `Tracker.afterFlush` 来等待它全部的响应式结果完成。
 
