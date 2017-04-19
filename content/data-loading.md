@@ -1,36 +1,36 @@
 ---
-title: Publications and Data Loading
+title: 发布和数据加载
 order: 11
-description: How and where to load data in your Meteor app using publications and subscriptions.
+description: Meteor 应用如何使用发布和订阅加载数据，以及在哪里加载数据
 discourseTopicId: 19661
 ---
 
-After reading this guide, you'll know:
+阅读完本文，你将能够：
 
-1. What publications and subscriptions are in the Meteor platform.
-2. How to define a publication on the server.
-3. Where to subscribe on the client and in which templates.
-4. Useful patterns for managing subscriptions.
-5. How to reactively publish related data.
-6. How to ensure your publication is secure in the face of reactive changes.
-7. How to use the low-level publish API to publish anything.
-8. What happens when you subscribe to a publication.
-8. How to turn a 3rd-party REST endpoint into a publication.
-10. How to turn a publication in your app into a REST endpoint.
+1. Meteor 平台中订阅和发布指的是什么。
+2. 如何在服务器端定义一个发布。
+3. 客户端如何订阅数据，以及使用哪个模板。
+4. 订阅管理的有效模式
+5. 如何响应式发布相关数据。
+6. 如何在响应式改变中确保发布是安全的。
+7. 如何使用低级发布 API  接口发布信息。
+8. 当订阅一个发布的时候会发生什么。
+8. 如何将第三方 REST 端点转换为一个发布。
+10. 如何将你应用中的一个发布转换为 一个 REST 端点。
 
-<h2 id="publications-and-subscriptions">Publications and subscriptions</h2>
+<h2 id="publications-and-subscriptions">发布和订阅</h2>
 
-In a traditional, HTTP-based web application, the client and server communicate in a "request-response" fashion. Typically the client makes RESTful HTTP requests to the server and receives HTML or JSON data in response, and there's no way for the server to "push" data to the client when changes happen at the backend.
+在传统的基于 HTTP 的 web 应用程序，客户端和服务器端是通过 “请求 - 响应” 的方式沟通的。经典的做法是客户端向服务器端发出 RESTful HTTP 请求，然后响应接收 HTML 或者 JSON 数据，但是当后端数据更新的时候服务器没有办法将数据推送到客户端。
 
-Meteor is built from the ground up on the Distributed Data Protocol (DDP) to allow data transfer in both directions. Building a Meteor app doesn't require you to set up REST endpoints to serialize and send data. Instead you create *publication* endpoints that can push data from server to client.
+Meteor 是建立在分布式数据协议(DDP)的基础上，允许前后端的数据交流。构建一个 Meteor 应用并不需要设置 REST 端点用于序列化和发送数据。我们通过构建 *publication* 端点将数据从服务器端推送到客户端。
 
-In Meteor a **publication** is a named API on the server that constructs a set of data to send to a client. A client initiates a **subscription** which connects to a publication, and receives that data. That data consists of a first batch sent when the subscription is initialized and then incremental updates as the published data changes.
+**publication** 是 Meteor 用于构建可发送到客户端的数据的 API 接口。客户端初始化 **subscription** 用于连接 publication 并获取数据。subscription 初始化时获取了数据，并根据发布的数据随时更新。
 
-So a subscription can be thought of as a set of data that changes over time. Typically, the result of this is that a subscription "bridges" a [server-side MongoDB collection](/collections.html#server-collections), and the [client side Minimongo cache](collections.html#client-collections) of that collection. You can think of a subscription as a pipe that connects a subset of the "real" collection with the client's version, and constantly keeps it up to date with the latest information on the server.
+所以订阅可以看作一组随时变化的数据。订阅架起了[服务器端 MongoDB 数据集](/collections.html#server-collections) 和 [客户端 Minimongo 缓存](collections.html#client-collections) 之间的桥梁。你可以把订阅想象成一条连接 “实际” 数据集子集和客户端 “缓存” 数据集的管道，并根据服务器端的数据不间断保持更新。
 
-<h2 id="publications">Defining a publication</h2>
+<h2 id="publications">定义一个发布</h2>
 
-A publication should be defined in a server-only file. For instance, in the Todos example app, we want to publish the set of public lists to all users:
+发布只能在服务器端文件定义。例如，在 Todos 应用中，我们对所有用户发布一系列的公开列表：
 
 ```js
 Meteor.publish('lists.public', function() {
@@ -42,18 +42,18 @@ Meteor.publish('lists.public', function() {
 });
 ```
 
-There are a few things to understand about this code block. First, we've named the publication with the unique string `lists.public`, and that will be how we access it from the client. Second, we are simply returning a Mongo *cursor* from the publication function. Note that the cursor is filtered to only return certain fields from the collection, as detailed in the [Security article](security.html#fields).
+理解这个代码块有几个关键点。首先，我们将该发布命名为 `lists.public`，可以从客户端通过该名字获取该发布。然后，简单地从发布函数返回一个 Mongo *cursor*。注意到 cursor 通过过滤只返回数据集中指定的域，了解更多请阅读[安全性章节](security.html#fields)。
 
-What that means is that the publication will simply ensure the set of data matching that query is available to any client that subscribes to it. In this case, all lists that do not have a `userId` setting. So the collection named `Lists` on the client will have all of the public lists that are available in the server collection named `Lists` while that subscription is open. In this particular example in the Todos application, the subscription is initialized when the app starts and never stopped, but a later section will talk about [subscription life cycle](data-loading.html#patterns).
+这意味着发布可以简单地确保将匹配查询的数据提供给订阅的客户端。在这个例子中，匹配查询的数据是指不带 `userId` 的列表。所以当开放订阅时，客户端名为 `Lists` 的数据集会存储所有服务器端名为 `Lists` 的数据集的公开列表。在 Todos 应用中，在应用开启时初始化订阅，并一直开放该订阅，在后面的章节我们会讨论[订阅的生命周期](data-loading.html#patterns)。
 
-Every publication takes two types of parameters:
+每个发布带两个变量参数：
 
-1. The `this` context, which has information about the current DDP connection. For example, you can access the current user's `_id` with `this.userId`.
-2. The arguments to the publication, which can be passed in when calling `Meteor.subscribe`.
+1. `this`，包含目前 DDP 连接的信息。例如，可以通过 `this.userId` 获取当前用户的 `_id`。
+2. 发布函数的参数，该参数可以在调用 `Meteor.subscribe` 时传递。
 
-> Note: Since we need to access context on `this` we need to use the `function() {}` form for publications rather than the ES2015 `() => {}`. You can disable the arrow function linting rule for publication files with `eslint-disable prefer-arrow-callback`. A future version of the publication API will work more nicely with ES2015.
+> 注意：因为我们要使用 `this` 所以应该使用 `function() {}` 而不是使用 ES2015 `() => {}`。可以通过 `eslint-disable prefer-arrow-callback` 在发布文件中禁用箭头函数。未来版本的发布 API 接口可以更好地跟 ES2015 兼容。
 
-In this publication, which loads private lists, we need to use `this.userId` to get only the todo lists that belong to a specific user.
+在这个加载私人列表的发布中，我们需要使用 `this.userId` 来获取只属于该用户的 todo 列表。
 
 ```js
 Meteor.publish('lists.private', function() {
@@ -69,15 +69,15 @@ Meteor.publish('lists.private', function() {
 });
 ```
 
-Thanks to the guarantees provided by DDP and Meteor's accounts system, the above publication can be confident that it will only ever publish private lists to the user that they belong to. Note that the publication will re-run if the user logs out (or back in again), which means that the published set of private lists will change as the active user changes.
+感谢 DDP 和 Meteor 的账户系统所提供的可靠保障，上面的发布可以确保获取只属于该用户的 todo 列表。注意到用户退出登录后发布会重新加载，这意味着发布的私人 todo 列表会根据用户的改变而改变。
 
-In the case of a logged-out user, we explicitly call `this.ready()`, which indicates to the subscription that we've sent all the data we are initially going to send (in this case none). It's important to know that if you don't return a cursor from the publication or call `this.ready()`, the user's subscription will never become ready, and they will likely see a loading state forever.
+对于未登录的用户，我们明确调用 `this.ready()`，对订阅说我们已经将所有应该发送的数据都给你了（在这个例子中没有数据）。如果在发布中没有返回 cursor 或者没有调用 `this.ready()`，用户的订阅就会一直进行中，用户可能会一直看到一个加载中的状态。
 
-Here's an example of a publication which takes a named argument. Note that it's important to check the types of arguments that come in over the network.
+下面是发布带有参数的例子。注意到首先检查参数的类型是否跟我们所期望的相同。
 
 ```js
 Meteor.publish('todos.inList', function(listId) {
-  // We need to check the `listId` is the type we expect
+  // 检查 `listId` 看是否是我们期望的类型
   new SimpleSchema({
     listId: {type: String}
   }).validate({ listId });
@@ -86,39 +86,39 @@ Meteor.publish('todos.inList', function(listId) {
 });
 ```
 
-When we subscribe to this publication on the client, we can provide this argument via the `Meteor.subscribe()` call:
+当在客户端订阅这个发布，可以在调用 `Meteor.subscribe()` 时提供 list._id：
 
 ```js
 Meteor.subscribe('todos.inList', list._id);
 ```
 
-<h3 id="organization-publications">Organizing publications</h3>
+<h3 id="organization-publications">组织一个发布</h3>
 
-It makes sense to place a publication alongside the feature that it's targeted for. For instance, sometimes publications provide very specific data that's only really useful for the view for which they were developed. In that case, placing the publication in the same module or directory as the view code makes perfect sense.
+把发布跟功能模块放在一起是有道理的。例如，有的时候发布提供了非常具体的数据，但这些数据只对所在的开发视图有用。在这个例子中，把发布跟视图代码放在同一个模块或目录下非常有意义。
 
-Often, however, a publication is more general. For example in the Todos example application, we create a `todos.inList` publication, which publishes all the todos in a list. Although in the application we only use this in one place (in the `Lists_show` template), in a larger app, there's a good chance we might need to access all the todos for a list in other places. So putting the publication in the `todos` package is a sensible approach.
+通常情况下发布应该更常见。在 Todos 应用中，我们创建了一个名为 `todos.inList` 的发布，用于发布列表中的所有 todos。尽管在应用中我们只在一个地方使用该发布（在 `Lists_show` 模板），在一个大型的应用，有很大可能我们需要在不同的地方获取列表中的所有 todos。所以把发布放在一个 `todos` 包是明智的做法。
 
-<h2 id="subscriptions">Subscribing to data</h2>
+<h2 id="subscriptions">订阅数据</h2>
 
-To use publications, you need to create a subscription to it on the client. To do so, you call `Meteor.subscribe()` with the name of the publication. When you do this, it opens up a subscription to that publication, and the server starts sending data down the wire to ensure that your client collections contain up to date copies of the data specified by the publication.
+要使用发布，需要在客户端创建对应的订阅。也即调用 `Meteor.subscribe()` 和发布的名字。当这样做的时候，会打开对该发布的订阅，然后服务器开始发送数据，确保客户端 “缓存” 数据集包含最新的发布数据。
 
-`Meteor.subscribe()` also returns a "subscription handle" with a property called `.ready()`. This is a reactive function that returns `true` when the publication is marked ready (either you call `this.ready()` explicitly, or the initial contents of a returned cursor are sent over).
+`Meteor.subscribe()` 同时返回一个带有 `.ready()` 属性的 "subscription handle"。这是一个响应函数，当发布被标记为 "ready" 时（无论是你明确调用 `this.ready()` 函数，还是 cursor 的初始内容已被发送）会返回 `true`。
 
 ```js
 const handle = Meteor.subscribe('lists.public');
 ```
 
-<h3 id="stopping-subscriptions">Stopping Subscriptions</h3>
+<h3 id="stopping-subscriptions">停止订阅</h3>
 
-The subscription handle also has another important property, the `.stop()` method. When you are subscribing, it is very important to ensure that you always call `.stop()` on the subscription when you are done with it. This ensures that the documents sent by the subscription are cleared from your local Minimongo cache and the server stops doing the work required to service your subscription. If you forget to call stop, you'll consume unnecessary resources both on the client and the server.
+订阅处理器还有另外一个重要的属性，就是 `.stop` 方法。当执行订阅的时候，订阅完成后要记住调用 `.stop()`。这可以确保通过订阅发送的文件从本地 Minimongo 缓存清除，服务器也会停止对该订阅的响应。如果忘记调用停止函数，会在客户端和服务器端消耗不必要的资源。
 
-*However*, if you call `Meteor.subscribe()` conditionally inside a reactive context (such as an `autorun`, or `getMeteorData` in React) or via `this.subscribe()` in a Blaze component, then Meteor's reactive system will automatically call `this.stop()` for you at the appropriate time.
+*但是*，当在响应环境（）中调用 `Meteor.subscribe()` 或者在 Blaze 组件中使用 `this.subscribe()`，Meteor 响应系统会根据情况自动调用 `this.stop()`。
 
-<h3 id="organizing-subscriptions">Subscribe in UI components</h3>
+<h3 id="organizing-subscriptions">UI 组件中的订阅</h3>
 
-It is best to place the subscription as close as possible to the place where the data from the subscription is needed. This reduces "action at a distance" and makes it easier to understand the flow of data through your application. If the subscription and fetch are separated, then it's not always clear how and why changes to the subscriptions (such as changing arguments), will affect the contents of the cursor.
+最好是将订阅代码尽可能跟需要这些订阅数据的模块放在一起。这可以降低 “超距作用” 和使得应用的数据流动更清晰。如果订阅和获取数据是分开的，那么当订阅改变时（例如改变函数），我们对于 cursor 内容会随着改变的认识可能不会那么清晰。
 
-What this means in practice is that you should place your subscription calls in *components*. In Blaze, it's best to do this in the `onCreated()` callback:
+在实践中这意味着你需要将订阅的调用代码放在 *components*。在 Blaze 组件中最好在 `onCreated()` 回调中调用订阅函数：
 
 ```js
 Template.Lists_show_page.onCreated(function() {
@@ -130,49 +130,49 @@ Template.Lists_show_page.onCreated(function() {
 });
 ```
 
-In this code snippet we can see two important techniques for subscribing in Blaze templates:
+在这个代码片段中我们可以看到 Blaze 模板中调用订阅函数的两个技巧：
 
-1. Calling `this.subscribe()` (rather than `Meteor.subscribe`), which attaches a special `subscriptionsReady()` function to the template instance, which is true when all subscriptions made inside this template are ready.
+1. 调用 `this.subscribe()` (而不是 `Meteor.subscribe`)，该函数附加一个特殊的 `subscriptionsReady()` 函数到模板实例，当模板中的订阅都准备好的时候 `subscriptionsReady()` 的值是 true。
 
-2. Calling `this.autorun` sets up a reactive context which will re-initialize the subscription whenever the reactive function `this.getListId()` changes.
+2. 调用 `this.autorun` 设置一个响应式背景，当响应式函数 `this.getListedId()` 函数改变的时候可以重新初始化订阅。
 
-Read more about Blaze subscriptions in the [Blaze article](blaze.html#subscribing), and about tracking loading state inside UI components in the [UI article](ui-ux.html#subscription-readiness).
+了解更多关于 Blaze 订阅的内容请阅读[Blaze 章节](blaze.html#subscribing)，了解更多关于跟踪 UI 组件中加载状态的请阅读[UI 章节](ui-ux.html#subscription-readiness)。
 
-<h3 id="fetching">Fetching data</h3>
+<h3 id="fetching">获取数据</h3>
 
-Subscribing to data puts it in your client-side collection. To use the data in your user interface, you need to query your client-side collection. There are a couple of important rules to follow when doing this.
+订阅数据并放在客户端数据集。要在用户界面使用数据，需要查询客户端的数据集。查询数据时有几点需要注意。
 
-<h4 id="specific-queries">Always use specific queries to fetch data</h4>
+<h4 id="specific-queries">总是使用特定查询获取数据</h4>
 
-If you're publishing a subset of your data, it might be tempting to simply query for all data available in a collection (i.e. `Lists.find()`) in order to get that subset on the client, without re-specifying the Mongo selector you used to publish that data in the first place.
+如果要发布数据的一个子集，比较有诱惑力的做法通常是查询服务器端数据集的所有数据（例如 `Lists.find()`），然后在客户端查询获取我们要的那个子集，而不需要在发布数据的时候就使用 MongoDB 选择器选定该子集。
 
-But if you do this, then you open yourself up to problems if another subscription pushes data into the same collection, since the data returned by `Lists.find()` might not be what you expected anymore. In an actively developed application, it's often hard to anticipate what may change in the future and this can be a source of hard to understand bugs.
+但如果这样做，当其他订阅的操作改变了同一个数据集的时候可能会发生错误，因为通过 `Lists.find()` 返回的数据可能会改变。在一个不断开发的应用中，要预料到未来的变化是比较难的，这对修复 bug 来说是一个很大的挑战。
 
-Also, when changing between subscriptions, there is a brief period where both subscriptions are loaded (see [Publication behavior when changing arguments](#publication-behavior-with-arguments) below), so when doing things like pagination, it's exceedingly likely that this will be the case.
+另外，当切换订阅的时候，有一个短暂的时期会加载这两个订阅（参考下文的[改变参数后的发布行为](#publication-behavior-with-arguments)），所以当在应用中执行分页功能时，有很大可能会出现这种情况。
 
-<h4 id="fetch-near-subscribe">Fetch the data nearby where you subscribed to it</h4>
+<h4 id="fetch-near-subscribe">在订阅的附近获取数据</h4>
 
-We do this for the same reason we subscribe in the component in the first place---to avoid action at a distance and to make it easier to understand where data comes from. A common pattern is to fetch the data in a parent template, and then pass it into a "pure" child component, as we'll see it in the [UI Article](ui-ux.html#components).
+原因跟我们将订阅代码尽可能跟需要这些订阅数据的模块放在一起是一样的 —— 这可以避免 “超距作用” 和使得应用的数据流动更清晰。一个常见的模式是在父级模板获取数据，然后传递个一个 “纯” 子集组件，如我们在[UI 章节](ui-ux.html#components)中看到的一样。
 
-Note that there are some exceptions to this second rule. A common one is `Meteor.user()`---although this is strictly speaking subscribed to (automatically usually), it's typically over-complicated to pass it through the component hierarchy as an argument to each component. However keep in mind it's best not to use it in too many places as it makes components harder to test.
+请注意，该准则也是有例外的。常见的就是 `Meteor.user()` —— 虽然严格来说这也是一个订阅（自动的），但是要将其作为参数通过组件层级传递给各个组件还是过于复杂了。记住不要很多地方使用因为做起组件测试会非常困难。
 
-<h3 id="global-subscriptions">Global subscriptions</h3>
+<h3 id="global-subscriptions">全局订阅</h3>
 
-One place where you might be tempted to not subscribe inside a component is when it accesses data that you know you *always* need. For instance, a subscription to extra fields on the user object (see the [Accounts Article](accounts.html)) that you need on every screen of your app.
+如果在应用中很多地方我们 *总是* 需要获取某些数据，那就不应该只在局部组件中定义一个订阅。例如，在你的应用中的很多地方都需要用户对象额外域的数据，这时就需要全局订阅。
 
-However, it's generally a good idea to use a layout component (which you wrap all your components in) to subscribe to this subscription anyway. It's better to be consistent about such things, and it makes for a more flexible system if you ever decide you have a screen that *doesn't* need that data.
+当然，比较好的方法是使用一个布局组件（封装应用中所有组件）订阅该订阅。这种做法应该保持一致，并且将系统做得灵活一点，这样应用中也可以有组件 *不需要* 这些全局订阅的数据。 
 
-<h2 id="patterns">Patterns for data loading</h2>
+<h2 id="patterns">数据加载模式</h2>
 
-Across Meteor applications, there are some common patterns of data loading and management on the client side that are worth knowing. We'll go into more detail about some of these in the [UI/UX Article](ui-ux.html).
+纵观 Meteor 应用，我们有必要知道客户端的数据加载和管理的常见模式。我们将在[UI/UX 章节](ui-ux.html)详细讲解。
 
-<h3 id="readiness">Subscription readiness</h3>
+<h3 id="readiness">订阅就绪</h3>
 
-It is key to understand that a subscription will not instantly provide its data. There will be a latency between subscribing to the data on the client and it arriving from the publication on the server. You should also be aware that this delay may be a lot longer for your users in production that for you locally in development!
+关键要明白订阅不会立即提供其订阅的数据。从客户端订阅数据到数据从服务器端的发布传递过来，期间会有延迟。你也应该意识到生产环境中的延迟可能比开发环境的更长。
 
-Although the Tracker system means you often don't *need* to think too much about this in building your apps, usually if you want to get the user experience right, you'll need to know when the data is ready.
+虽然跟踪系统可以使得我们在构建应用时不 *需要* 过多考虑这个问题，但想要让用户体验最佳，需要知道数据说明时候准备好。
 
-To find that out, `Meteor.subscribe()` and (`this.subscribe()` in Blaze components) returns a "subscription handle", which contains a reactive data source called `.ready()`:
+要知道数据说明时候准备好，`Meteor.subscribe()` 和 ( Blaze 组件中的 `this.subscribe()`)返回一个 包含响应式数据源 `.ready()` 的 "subscription handle"：
 
 ```js
 const handle = Meteor.subscribe('lists.public');
@@ -182,11 +182,11 @@ Tracker.autorun(() => {
 });
 ```
 
-We can use this information to be more subtle about when we try and show data to users, and when we show a loading screen.
+当我们尝试展示数据给用户或者展示一个加载中的画面时，我们可以使用这些信息。
 
-<h3 id="changing-arguments">Reactively changing subscription arguments</h3>
+<h3 id="changing-arguments">响应式变更订阅参数</h3>
 
-We've already seen an example of using an `autorun` to re-subscribe when the (reactive) arguments to a subscription change. It's worth digging in a little more detail to understand what happens in this scenario.
+当订阅的参数改变时，我们使用 `autorun` 再次订阅，相关的例子我们也看过了。但详细的内容我们放在这里讲：
 
 ```js
 Template.Lists_show_page.onCreated(function() {
@@ -198,40 +198,40 @@ Template.Lists_show_page.onCreated(function() {
 });
 ```
 
-In our example, the `autorun` will re-run whenever `this.getListId()` changes, (ultimately because `FlowRouter.getParam('_id')` changes), although other common reactive data sources are:
+在这个例子中，当 `this.getListId()` 改变时 `autorun` 都会重新运行，（其实是因为 `FlowRouter.getParam('_id')` 改变了），其他常见的响应式数据源有：
 
-1. Template data contexts (which you can access reactively with `Template.currentData()`).
-2. The current user status (`Meteor.user()` and `Meteor.loggingIn()`).
-3. The contents of other application specific client data stores.
+1. 模板的数据背景（可以通过 `Template.currentData()` 响应式获取）。
+2. 当前用户状态（`Meteor.user()` 和 `Meteor.loggingIn()`）。
+3. 其他针对应用的客户端数据存储内容。
 
-Technically, what happens when one of these reactive sources changes is the following:
+技术上来说，当这些响应式数据源其中一项改变时，会有以下变化：
 
-1. The reactive data source *invalidates* the autorun computation (marks it so that it re-runs in the next Tracker flush cycle).
-2. The subscription detects this, and given that anything is possible in next computation run, marks itself for destruction.
-3. The computation re-runs, with `.subscribe()` being re-called either with the same or different arguments.
-4. If the subscription is run with the *same arguments* then the "new" subscription discovers the old "marked for destruction" subscription that's sitting around, with the same data already ready, and simply reuses that.
-5. If the subscription is run with *different arguments*, then a new subscription is created, which connects to the publication on the server.
-6. At the end of the flush cycle (i.e. after the computation is done re-running), the old subscription checks to see if it was re-used, and if not, sends a message to the server to tell the server to shut it down.
+1. 响应式数据源使得 autorun *失效*（给它做一个标记在下一个跟踪器冲洗周期重新运行）。
+2. 订阅检测到以上变化时，下一个计算运行后可以有多种结果，因此订阅把自己标记为可重构的。
+3. 计算重新运行，重新调用 `.subscibe()`，可以带相同或不同的参数。
+4. 如果订阅运行使用 *相同的参数*，那么 “新” 的订阅会发现之前 “把自己标记为可重构” 的订阅，相同的数据已经准备好了，拿来用就可以。
+5. 如果订阅运行使用 *不同的参数*，会生成一个新的订阅，链接到服务器端的发布。
+6. 在冲洗周期结束后（例如重新计算结束后），旧的订阅会检测自己是否有被重新使用，没有的话发送信息关闭该订阅的信息到服务器。
 
-Step 4 above is an important detail---that the system cleverly knows not to re-subscribe if the autorun re-runs and subscribes with the exact same arguments. This holds true even if the new subscription is set up somewhere else in the template hierarchy. For example, if a user navigates between two pages that both subscribe to the exact same subscription, the same mechanism will kick in and no unnecessary subscribing will happen.
+上面的步骤 4 是一个重要的细节 —— 系统清楚地知道如果参数相同的话不需要重新订阅。这对模板结构中其他新订阅来说也是一样的。例如，如果用户在两个有相同订阅的页面之间切换，相同的机制将会发生，因此没有必要重新订阅。
 
-<h3 id="publication-behavior-with-arguments">Publication behavior when arguments change</h3>
+<h3 id="publication-behavior-with-arguments">参数改变后的发布行为</h3>
 
-It's also worth knowing a little about what happens on the server when the new subscription is started and the old one is stopped.
+当开始新的订阅和停止旧的订阅时服务器上发生了什么，这也是很值得了解的。
 
-The server *explicitly* waits until all the data is sent down (the new subscription is ready) for the new subscription before removing the data from the old subscription. The idea here is to avoid flicker---you can, if desired, continue to show the old subscription's data until the new data is ready, then instantly switch over to the new subscription's complete data set.
+服务器 *明确地* 等到所有数据都被发送（新的订阅准备好了）之后再从旧的订阅中删除数据。目的是防止闪烁 —— 当然你可以一直显示旧的订阅获取的数据直到新的数据准备好，然后立即切换到新订阅的完整数据集。
 
-What this means is in general, when changing subscriptions, there'll be a period where you are *over-subscribed* and there is more data on the client than you strictly asked for. This is one very important reason why you should always fetch the same data that you have subscribed to (don't "over-fetch").
+想说明的是，通常情况下，当改变订阅的时候，有一段时间会 *过度获取* 数据，客户端的数据比我们查询的多。这也是为什么我们应该获取和订阅相同的数据（而不是 “过度获取”）。
 
-<h3 id="pagination">Paginating subscriptions</h3>
+<h3 id="pagination">订阅分页</h3>
 
-A very common pattern of data access is pagination. This refers to the practice of fetching an ordered list of data one "page" at a time---typically some number of items, say twenty.
+一个非常常见的数据访问方式是分页。这指的是在一个页面获取有序列表的数据 —— 通常是一定数量的物品，假设 20 件。
 
 There are two styles of pagination that are commonly used, a "page-by-page" style---where you show only one page of results at a time, starting at some offset (which the user can control), and "infinite-scroll" style, where you show an increasing number of pages of items, as the user moves through the list (this is the typical "feed" style user interface).
 
 In this section, we'll consider a publication/subscription technique for the second, infinite-scroll style pagination. The page-by-page technique is a little tricker to handle in Meteor, due to it being difficult to calculate the offset on the client. If you need to do so, you can follow many of the same techniques that we use here and use the [`percolate:find-from-publication`](https://atmospherejs.com/percolate/find-from-publication) package to keep track of which records have come from your publication.
 
-In an infinite scroll publication, we simply need to add a new argument to our publication controlling how many items to load. Suppose we wanted to paginate the todo items in our Todos example app:
+在一个可以无限滚动下拉的页面，我们只需要简单在订阅中添加一个新参数控制加载的物品数量。例如我们要在 Todos 应用中实现分页。
 
 ```js
 const MAX_TODOS = 1000;
@@ -286,7 +286,7 @@ Then on the client, after subscribing to that publication, we can access the cou
 Counts.get(`Lists.todoCount.${listId}`)
 ```
 
-<h2 id="stores">Client-side data with reactive stores</h2>
+<h2 id="stores">客户端数据和响应式存储</h2>
 
 In Meteor, persistent or shared data comes over the wire on publications. However, there are some types of data which doesn't need to be persistent or shared between users. For instance, the "logged-in-ness" of the current user, or the route they are currently viewing.
 
@@ -294,7 +294,7 @@ Although client-side state is often best contained as state of an individual tem
 
 Usually such state is stored in a *global singleton* object which we can call a store. A singleton is a data structure of which only a single copy logically exists. The current user and the router from above are typical examples of such global singletons.
 
-<h3 id="store-types">Types of stores</h3>
+<h3 id="store-types">存储的类型</h3>
 
 In Meteor, it's best to make stores *reactive data* sources, as that way they tie most naturally into the rest of the ecosystem. There are a few different packages you can use for stores.
 
@@ -329,13 +329,13 @@ The advantage of a `ReactiveDict` is you can access each property individually (
 
 If you need to query the store, or store many related items, it's probably a good idea to use a Local Collection (see the [Collections Article](collections.html#local-collections)).
 
-<h3 id="accessing-stores">Accessing stores</h3>
+<h3 id="accessing-stores">访问存储</h3>
 
 You should access stores in the same way you'd access other reactive data in your templates---that means centralizing your store access, much like you centralize your subscribing and data fetch. For a Blaze template, that's either in a helper, or from within a `this.autorun()` inside an `onCreated()` callback.
 
 This way you get the full reactive power of the store.
 
-<h3 id="updating-stores">Updating stores</h3>
+<h3 id="updating-stores">上传存储</h3>
 
 If you need to update a store as a result of user action, you'd update the store from an event handler, just like you call [Methods](methods.html).
 
@@ -349,11 +349,11 @@ WindowSize.simulateMobile = (device) => {
 }
 ```
 
-<h2 id="advanced-publications">Advanced publications</h2>
+<h2 id="advanced-publications">更高级的发布</h2>
 
 Sometimes, the simple mechanism of returning a query from a publication function won't cover your needs. In those situations, there are some more powerful publication patterns that you can use.
 
-<h3 id="publishing-relations">Publishing relational data</h3>
+<h3 id="publishing-relations">发布关系型数据</h3>
 
 It's common to need related sets of data from multiple collections on a given page. For instance, in the Todos app, when we render a todo list, we want the list itself, as well as the set of todos that belong to that list.
 
@@ -425,7 +425,7 @@ Meteor.publishComposite('todos.inList', function(listId) {
 
 In this example, we write a complicated query to make sure that we only ever find a list if we are allowed to see it, then, once per list we find (which can be one or zero times depending on access), we publish the todos for that list. Publish Composite takes care of stopping and starting the dependent cursors if the list stops matching the original query or otherwise.
 
-<h3 id="complex-auth">Complex authorization</h3>
+<h3 id="complex-auth">复杂的授权</h3>
 
 We can also use `publish-composite` to perform complex authorization in publications. For instance, consider if we had a `Todos.admin.inList` publication that allowed an admin to bypass default publication's security for users with an `admin` flag set.
 
@@ -477,7 +477,7 @@ Meteor.publishComposite('Todos.admin.inList', function(listId) {
 });
 ```
 
-<h3 id="custom-publication">Custom publications with the low level API</h3>
+<h3 id="custom-publication">使用低级 API 接口自定义发布</h3>
 
 In all of our examples so far (outside of using`Meteor.publishComposite()`) we've returned a cursor from our `Meteor.publish()` handlers. Doing this ensures Meteor takes care of the job of keeping the contents of that cursor in sync between the server and the client. However, there's another API you can use for publish functions which is closer to the way the underlying Distributed Data Protocol (DDP) works.
 
@@ -511,7 +511,7 @@ From the client's perspective, data published like this doesn't look any differe
 
 One point to be aware of is that if you allow the user to *modify* data in the "pseudo-collection" you are publishing in this fashion, you'll want to be sure to re-publish the modifications to them via the publication, to achieve an optimistic user experience.
 
-<h3 id="lifecycle">Subscription lifecycle</h3>
+<h3 id="lifecycle">订阅的生命周期</h3>
 
 Although you can use publications and subscriptions in Meteor via an intuitive understanding, sometimes it's useful to know exactly what happens under the hood when you subscribe to data.
 
@@ -555,11 +555,11 @@ This continues until the client [stops](#stopping-subscriptions) the subscriptio
 
 5. The `nosub` message is sent to the client to indicate that the subscription has stopped.
 
-<h2 id="rest-interop">Working with REST APIs</h2>
+<h2 id="rest-interop">使用 REST API 接口</h2>
 
 Publications and subscriptions are the primary way of dealing with data in Meteor's DDP protocol, but lots of data sources use the popular REST protocol for their API. It's useful to be able to convert between the two.
 
-<h3 id="loading-from-rest">Loading data from a REST endpoint with a publication</h3>
+<h3 id="loading-from-rest">使用发布从 REST 端点加载数据</h3>
 
 As a concrete example of using the [low-level API](#custom-publication), consider the situation where you have some 3rd party REST endpoint which provides a changing set of data that's valuable to your users. How do you make that data available?
 
@@ -600,7 +600,7 @@ Meteor.publish('polled-publication', function() {
 
 Things can get more complicated; for instance you may want to deal with documents being removed, or share the work of polling between multiple users (in a case where the data being polled isn't private to that user), rather than doing the exact same poll for each interested user.
 
-<h3 id="publications-as-rest">Accessing a publication as a REST endpoint</h3>
+<h3 id="publications-as-rest">以 REST 端点身份访问一个发布</h3>
 
 The opposite scenario occurs when you want to publish data to be consumed by a 3rd party, typically over REST. If the data we want to publish is the same as what we already publish via a publication, then we can use the [simple:rest](https://atmospherejs.com/simple/rest) package to do this really easily.
 
