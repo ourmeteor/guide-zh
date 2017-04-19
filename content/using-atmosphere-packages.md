@@ -1,24 +1,24 @@
 ---
-title: Using Atmosphere Packages
+title: 使用 Atmosphere 包
 order: 28
 discourseTopicId: 20193
 ---
 
-<h2 id="atmosphere-searching">Searching for packages</h2>
+<h2 id="atmosphere-searching">查找包</h2>
 
-There are a few ways to search for Meteor packages published to Atmosphere:
+There are a few ways to search for Meteor packages published to Atmosphere:有下面几种方式查找发布在 Atmosphere 上面的 Meteor 包：
 
-1. Search on the [Atmosphere website](https://atmospherejs.com/).
-2. Use `meteor search` from the command line.
-3. Use a community package search website like [Fastosphere](http://fastosphere.meteor.com/).
+1. 在[Atmosphere 网站](https://atmospherejs.com/)上查找。
+2. 在命令行输入 `meteor search` 查找。
+3. 使用类似[Fastosphere](http://fastosphere.meteor.com/)的社区包查找网站。
 
-The main Atmosphere website provides additional curation features like trending packages, package stars, and flags, but some of the other options can be faster if you're trying to find a specific package. For example, you can use `meteor show kadira:flow-router` from the command line to see the description of that package and different available versions.
+Atmosphere 网站提供了额外的策展功能如包的下载趋势，包的星数和标志数，但其他方式在查找特定包的时候会更快。例如，你可以在命令行使用 `meteor show kadira:flow-router`查看该包的简介和可使用的版本。
 
-<h3 id="atmosphere-naming">Package naming</h3>
+<h3 id="atmosphere-naming">包命名</h3>
 
 You may notice that, with the exception of Meteor platform packages, all packages on Atmosphere have a name of the form `prefix:package-name`. The prefix is the Meteor Developer username of the organization or user that published the package. Meteor uses such a convention for package naming to make sure that it's clear who has published a certain package, and to avoid an ad-hoc namespacing convention. Meteor platform packages do not have any `prefix:`.
 
-<h2 id="installing-atmosphere">Installing Atmosphere Packages</h2>
+<h2 id="installing-atmosphere">安装 Atmosphere 包</h2>
 
 To install an Atmosphere package, you simply run `meteor add`:
 
