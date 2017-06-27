@@ -145,7 +145,9 @@ theme: meteor
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
-  type:
+  type: git
+  repo: https://github.com/ourmeteor/guide-zh
+  branch: gh-pages
 
 redirects:
   '/using-packages.html': atmosphere-vs-npm.html
