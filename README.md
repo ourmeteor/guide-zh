@@ -4,7 +4,7 @@
 
 [阅读指南中译官方版](http://guide.meteor.com/zh_cn)
 
-[阅读指南中译开发版](http://guide-zh.ourmeteor.com/)
+[阅读指南中译开发版](http://guide-zh.meteor.cool/)
 
 >开发版为本 repo `master` 分支最新内容，不保证正确性，请谨慎翻阅。
 
@@ -18,7 +18,9 @@
 
 ## 注意
 
-本 repo 已合并至 `meteor/guide`。由于 MDG 尚未提出有效的翻译/本地化管理方案，所有翻译请继续提交至本 repo，我们将会不定期同步至官方版。
+本 repo 采用 GitLocalize 翻译，欢迎贡献翻译。我们将不定期从官方 repo 同步，在 `contents` 文件夹保留原文件，翻译在语言命名的文件夹内进行，请勿修改源文件。
+
+由于 MDG 尚未提出有效的翻译/本地化管理方案，所有翻译请继续提交至本 repo，我们将会不定期同步至官方版。
 
 ## 如何贡献翻译
 
