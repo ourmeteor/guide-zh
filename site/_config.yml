@@ -26,32 +26,32 @@ versions:
 sidebar_categories:
   null:
     - index
-    - code-style
-    - structure
-    - 1.5-migration
-  Data:
-    - collections
-    - data-loading
-    - methods
-    - accounts
-    - testing
-  View:
-    - routing
-    - ui-ux
-    - blaze
-    - react
-    - angular
-  Build:
-    - atmosphere-vs-npm
-    - using-atmosphere-packages
-    - writing-atmosphere-packages
-    - using-npm-packages
-    - writing-npm-packages
-    - mobile
-    - build-tool
-  Production:
-    - security
-    - deployment
+#    - code-style
+#    - structure
+#    - 1.5-migration
+#  Data:
+#    - collections
+#    - data-loading
+#    - methods
+#    - accounts
+#    - testing
+#  View:
+#    - routing
+#    - ui-ux
+#    - blaze
+#    - react
+#    - angular
+#  Build:
+#    - atmosphere-vs-npm
+#    - using-atmosphere-packages
+#    - writing-atmosphere-packages
+#    - using-npm-packages
+#    - writing-npm-packages
+#    - mobile
+#    - build-tool
+#  Production:
+#    - security
+#    - deployment
   Meta:
     - CONTRIBUTING
     - CHANGELOG
