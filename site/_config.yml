@@ -3,19 +3,19 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Meteor Guide
-subtitle: The Official Guide
+title: Meteor 指南
+subtitle: 官方指南
 description:
 author:
 language:
 timezone:
-github_repo: meteor/guide
-apis:
-  gtm: GTM-MBQ369M
-  segment: zQx6cQifkTU79E3L0XAnmrOXP2A5bC6r
-  docsearch:
-    apiKey: bdf6b09d12024f6bae3631a0dfdd4a7f
-    indexName: meteor_api_guide
+github_repo: ourmeteor/guide-zh
+#apis:
+#  gtm: GTM-MBQ369M
+#  segment: zQx6cQifkTU79E3L0XAnmrOXP2A5bC6r
+#  docsearch:
+#    apiKey: bdf6b09d12024f6bae3631a0dfdd4a7f
+#    indexName: meteor_api_guide
 versions:
   - '1.5'
   - '1.4'
@@ -62,22 +62,22 @@ favicon: '../images/favicon.png'
 logo:
   nav_mobile: '../images/logo-coralspace-left.svg'
   url: 'http://www.meteor.com/developers'
-  title: 'Meteor Developers'
-  subtitle: 'Developers'
+  title: 'Meteor 开发者'
+  subtitle: '开发者'
 
 nav_links:
-  'Tutorials':
+  '教程':
     url: http://www.meteor.com/tutorials
     partial: illustration-guide
     target: _new
-  'Guide':
+  '指南':
     url: http://guide.meteor.com
     partial: illustration-compass
     active: true
-  'API Docs':
+  'API 文档':
     url: http://docs.meteor.com
     partial: illustration-logs
-  'Forums':
+  '论坛':
     url: https://forums.meteor.com/
     partial: illustration-support
     target: _new
@@ -89,7 +89,7 @@ social_links:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://guide.meteor.com/
+url: http://guide-zh.meteor.org.cn # Thanks to 金刀客
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
