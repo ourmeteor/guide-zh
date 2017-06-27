@@ -5,6 +5,11 @@ branches:
   only:
   - master
 before_install:
+- openssl aes-256-cbc -K $encrypted_e978a7e585f7_key -iv $encrypted_e978a7e585f7_iv -in .travis/id_rsa.enc -out ~/.ssh/id_rsa -d
+- chmod 600 ~/.ssh/id_rsa 
+- eval $(ssh-agent)
+- ssh-add ~/.ssh/id_rsa
+- cp .travis/ssh_config ~/.ssh/config
 - git config --global user.name 'laosb'
 - git config --global user.email laosb@lasteam.net
 install:
