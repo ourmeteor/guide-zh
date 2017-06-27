@@ -146,7 +146,7 @@ theme: meteor
 ## Docs: http://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: https://github.com/ourmeteor/guide-zh
+  repo: https://${GH_TOKEN}@github.com/ourmeteor/guide-zh
   branch: gh-pages
 
 redirects:
