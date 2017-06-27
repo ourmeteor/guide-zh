@@ -93,7 +93,7 @@ Meteor 具体的 API 可以在[文档站](https://docs.meteor.com)获取到，�
 <h3 id="contributing">贡献</h3>
 
 
-该指南的持续开发被**公开在** [GitHub](https://github.com/meteor/guide) 上。我们鼓励 pull requests 和 issues 来讨论和修改这里面有问题的内容。我们希望保持我们在进度上的开放和真实，这样可以将该指南的计划和 Meteor 将来在版本上的更新表述的更加清晰。
+该指南的持续开发被**公开在** [GitHub](https://github.com/meteor/guide) 上。我们鼓励 pull requests 和 issues 来讨论和修改这里面有问题的内容。我们希望保持我们在进度上的开放和真实，这样可以将该指南的计划和 Meteor 将来在版本上的更新表述的更加清晰。<br>
 
 
 <h3 id="goals">项目目标</h3>
