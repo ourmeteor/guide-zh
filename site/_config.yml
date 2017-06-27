@@ -89,7 +89,7 @@ social_links:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://guide-zh.meteor.org.cn # Thanks to 金刀客
+url: http://guide-zh.meteor.cool # Thanks to 金刀客
 root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
